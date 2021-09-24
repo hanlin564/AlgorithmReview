@@ -81,3 +81,81 @@ class Solution {
 ```
 
 这题和[43.字符串相乘](https://leetcode-cn.com/problems/multiply-strings/)异曲同工，两题应该结合起来看
+
+
+
+### [3. 前n个数字二进制中1的个数](https://leetcode-cn.com/problems/w3tCBm/)
+
+```java
+class Solution {
+    public int[] countBits(int n) {
+        int[] ans = new int[n + 1];
+
+        for (int i = 1; i <= n; i++) {
+            //若当前数i是偶数，可以发现当前数的二进制1的位数和i/2的二进制数是一样的
+            //比如：2(10),4(100),8(1000)...每个偶数都是它的一半往左移一位
+            if (i % 2 == 0) {
+                ans[i] = ans[i / 2];
+            } else {
+                //若当前数i是奇数，那它的二进制1的个数是i-1的二进制1的个数+1
+                ans[i] = ans[i - 1] + 1;
+            }
+        }
+
+        return ans;
+    }
+}
+```
+
+
+
+### [4. 只出现一次的数字](https://leetcode-cn.com/problems/WGki4K/)
+
+解法一：全用位运算，很难理解。抄了K神的答案，但我还是没搞太懂；或者说看懂了，还是没能学会其精髓
+
+[k神的题解链接](https://leetcode-cn.com/problems/WGki4K/solution/jian-zhi-offer-ii-004-zhi-chu-xian-yi-ci-l3ud/)
+
+```java
+//这个解法的大体思路就是把每一位的二进制位的状态变化情况给列举出来（有限状态自动机）
+//用位运算做了优化，特别是用与和非运算把if else都省了，这操作太强了吧
+//需要ones和twos两个位的原因：对3取余有0、1、2三种状态，用一位是无法表示三种状态的
+//ones的状态变化还能看懂，twos的状态变化看傻了
+class Solution {
+    public int singleNumber(int[] nums) {
+        int ones = 0, twos = 0;
+        for (int num : nums) {
+            ones = ones ^ num & ~twos;
+            twos = twos ^ num & ~ones;
+        }
+        return ones;
+    }
+}
+```
+
+解法二：遍历统计，统计正常人能想到的思路（还是很难）
+
+```java
+class Solution {
+    public int singleNumber(int[] nums) {
+        //第一个循环：统计nums数组每个元素的每一位的二进制的和
+        //这个结果保存在count数组中
+        int[] count = new int[32];
+        for (int num : nums) {
+            for (int i = 0; i < 32; i++) {
+                count[i] += num & 1;//把num中第i位的二进制位累加到count[i]上
+                num >>>= 1;//num右移然后与1相与，循环执行这个操作可以得到num二进制的每一位
+            }
+        }
+
+        //第二个循环：从二进制统计结果count中还原res
+        //先让res左移，使得res的最后一位为0；count中的每一个元素对3取余，然后添加到res的最后一位
+        int res = 0, m = 3;
+        for (int i = 0; i < 32; i++) {
+            res <<= 1;
+            res |= count[31 - i] % m;
+        }
+        return res;
+    }
+}
+```
+
