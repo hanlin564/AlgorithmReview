@@ -159,3 +159,39 @@ class Solution {
 }
 ```
 
+
+
+### [5.单词长度的最大乘积](https://leetcode-cn.com/problems/aseY1I/)
+
+```java
+class Solution {
+    public int maxProduct(String[] words) {
+        //字母有26个，int长度为32位，所以能通过设置一个int中指定位为1来表示是否一个单词中是否包含某个字母
+        //例如：单词中包含a，那么对应int中第一位就为1；包含b，第二位就为1
+        int[] charCount = new int[words.length];
+        //遍历每个单词
+        for (int i = 0; i < words.length; i++) {
+            //遍历单词中的每个字母
+            for (char c : words[i].toCharArray()) {
+                //通过当前字母-'a'来求出当前字符相对于a的偏移量
+                //a自身的偏移量为0，b为1，z为26，以此类推
+                //求出偏移量后，把1向左移动相应的偏移量，并与charCount[i]做或运算
+                charCount[i] |= 1 << (c - 'a');d
+            }
+        }
+        int result = 0;
+        //两两对比每个单词
+        for (int i = 0; i < words.length; i++) {
+            for (int j = i + 1; j < words.length; j++) {
+                //若两个单词做与运算的结果为0，说明这两单词一定没有相同的字母
+                if ((charCount[i] & charCount[j]) == 0) {
+                    //求最大长度乘积
+                    result = Math.max(result, words[i].length() * words[j].length());
+                }
+            }
+        }
+        return result;
+    }
+}
+```
+
