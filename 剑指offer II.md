@@ -195,3 +195,68 @@ class Solution {
 }
 ```
 
+
+
+### [6. 排序数组中两个数字之和](https://leetcode-cn.com/problems/kLl5u1/)
+
+解法一：双指针
+
+```java
+class Solution {
+    public int[] twoSum(int[] numbers, int target) {
+        int len = numbers.length;
+        int i = 0, j = len - 1;
+        while (i < j) {
+            int sum = numbers[i] + numbers[j];
+          	//1.若两数之和等于target，返回i和j
+          	//2.若大于target，使j左移
+          	//3.若小于target，使i右移
+            if (sum == target) {
+                return new int[]{i, j};
+            } else if (sum > target) {
+                j--;
+            } else {
+                i++;
+            }
+        }
+        return new int[]{i, j};
+    }
+}
+```
+
+解法二：二分查找
+
+```java
+class Solution {
+    public int[] twoSum(int[] numbers, int target) {
+        for (int i = 0; i < numbers.length; i++) {
+          	//固定当前数x，然后查找target-x的下标
+            int x = numbers[i];
+            int index = binarySearch(numbers, i + 1, numbers.length - 1, target - x);
+	          //若找到了target-x的下标，就返回i和index
+            if (index != -1) {
+                return new int[]{i, index};
+            }
+        }
+        return new int[0];
+    }
+
+  	/**
+     * 在nums中查找整数target的下标，若不存在则返回-1
+     */
+    private int binarySearch(int[] nums, int left, int right, int target) {
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+            if (nums[mid] == target) {
+                return mid;
+            } else if (nums[mid] > target) {
+                right = mid - 1;
+            } else {
+                left = mid + 1;
+            }
+        }
+        return -1;
+    }
+}
+```
+
