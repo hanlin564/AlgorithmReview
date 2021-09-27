@@ -260,3 +260,51 @@ class Solution {
 }
 ```
 
+
+
+## 数组
+
+### [7. 数组中和为0的三个数](https://leetcode-cn.com/problems/1fGaJU/)
+
+```java
+class Solution {
+    public List<List<Integer>> threeSum(int[] nums) {
+        //如果数组长度小于3，是不可能凑出三元组的
+        if (nums == null || nums.length < 3) {
+            return new ArrayList<>();
+        }
+        List<List<Integer>> res = new ArrayList<>();
+        //对数组进行排序
+        Arrays.sort(nums);
+
+        //先固定i，然后找合为-nums[i]的两个数
+        for (int i = 0; i < nums.length - 2; i++) {
+            //跳过所有重复的i
+            if (i > 0 && nums[i] == nums[i - 1]) {
+                continue;
+            }
+            int target = -nums[i];
+            //在i+1到nums.length-1的区间内找和为target的两个数
+            //因为进行了排序，所以使用双指针法而不是HashMap
+            int left = i + 1;
+            int right = nums.length - 1;
+            while (left < right) {
+                int sum = nums[left] + nums[right];
+                if (sum == target) {
+                    res.add(Arrays.asList(nums[i], nums[left], nums[right]));
+                    //左右指针跳过所有重复的数
+                    while (left < right && nums[left] == nums[++left]);
+                    while (left < right && nums[right] == nums[--right]);
+                } else if (sum > target) {
+                    right--;
+                } else {
+                    left++;
+                }
+            }
+        }
+
+        return res;
+    }
+}
+```
+
