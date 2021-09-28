@@ -308,3 +308,27 @@ class Solution {
 }
 ```
 
+
+
+### [8. 和大于等于target的最短子数组](https://leetcode-cn.com/problems/2VG8Kg/)
+
+```java
+class Solution {
+    public int minSubArrayLen(int target, int[] nums) {
+        int left = 0;
+        int sum = 0;
+        int ans = Integer.MAX_VALUE;
+        for (int right = 0; right < nums.length; right++) {
+            sum += nums[right];
+            //一旦满足了sum>=targer，就尽量缩小左边界，直到sum>=target不成立再扩大右边界
+            while (sum >= target) {
+                ans = Math.min(ans, right - left + 1);
+                sum -= nums[left++];
+            }
+        }
+        //若ans比length大说明没找到满足要求的连续子序列
+        return ans > nums.length ? 0 : ans;
+    }
+}
+```
+
