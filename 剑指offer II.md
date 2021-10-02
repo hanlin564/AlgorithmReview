@@ -332,3 +332,31 @@ class Solution {
 }
 ```
 
+
+
+### [9. 乘积小于k的子数组](https://leetcode-cn.com/problems/ZVAVXX/)
+
+```java
+class Solution {
+    public int numSubarrayProductLessThanK(int[] nums, int k) {
+        int left = 0;
+        int ans = 0;
+        //乘积初始化为1
+        int product = 1;
+        for (int right = 0; right < nums.length; right++) {
+            //乘积累乘以滑动窗口右端的数
+            product *= nums[right];
+            //在满足乘积大于等于k的情况下，尽量缩小滑动窗口左端
+            //由于left、right只向右移动不会回到之前的位置，所以不会重复统计满足要求的子数组
+            while (left <= right && product >= k) {
+                product /= nums[left++];
+            }
+            if (left <= right) {
+                ans += right - left + 1;
+            }
+        }
+        return ans;
+    }
+}
+```
+
