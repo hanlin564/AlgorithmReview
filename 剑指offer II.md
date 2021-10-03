@@ -360,3 +360,37 @@ class Solution {
 }
 ```
 
+
+
+### [10. 和为k的子数组](https://leetcode-cn.com/problems/QTMn0o/)
+
+```java
+class Solution {
+    public int subarraySum(int[] nums, int k) {
+        //用map来记录前面的presum出现的次数
+        Map<Integer, Integer> preSumFreq = new HashMap<>();
+        preSumFreq.put(0, 1);
+        //preSum用来保存从第一个元素到当前元素num的所有元素和
+        int preSum = 0;
+        //count用来保存和为k的子数组个数
+        int count = 0;
+        //遍历数组
+        for (int num : nums) {
+            //更新preSum的值
+            preSum += num;
+            //对于一个数num，我们想求有多少个以num结尾的子数组和为k
+            //当前的元素总和为preSum（nums[0]+nums[1]+...+num），假设有一个数在nums[0]~num的子区间内
+            //从这个数开始往p后一直到num的子数组之和为k，可以经过推导得出preSum(num) - preSum(k) = k，即preSum(k)=preSum(num)-k
+            //由于我们把从数组首元素到当前的所有preSum及其出现次数都存在map里来，我们可以通过preSum - k得到preSum(k)出现的次数
+            //这个次数也即是preSum(num) - preSum(k) = k这个式子能成立的次数，把它累加到count上
+            if (preSumFreq.containsKey(preSum - k)) {
+                count += preSumFreq.get(preSum - k);
+            }
+            //维护map
+            preSumFreq.put(preSum, preSumFreq.getOrDefault(preSum, 0) + 1);
+        }
+        return count;
+    }
+}
+```
+
