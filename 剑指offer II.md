@@ -394,3 +394,66 @@ class Solution {
 }
 ```
 
+
+
+### [11. 0和1个数相同的子数组](https://leetcode-cn.com/problems/A1NYOS/)
+
+```java
+class Solution {
+    public int findMaxLength(int[] nums) {
+        //map存放的是"某个前缀和出现的最小下标"
+        Map<Integer, Integer> map = new HashMap<>();
+        //初始化前缀和0的最小下标为-1
+        //在遍历过程中若preSum为0，那从第一个元素到当前元素的长度就为当前符合条件的子数组的长度
+        //如：遍历到下标为3的元素时发现preSum为0，那么当前满足条件子数组的长度就是3-(-1)=4
+        map.put(0, -1);
+        //preSum记录从头遍历到当前数的总前缀和
+        int preSum = 0;
+        //ans记录相同数量0和1的最长连续子数组的长度
+        int ans = 0;
+        for (int i = 0; i < nums.length; i++) {
+            //若当前数为0就加上-1，这样当出现相同数量的0和1时，preSum就为0
+            //反过来也可以说preSum为0说明数组存在相同数量的0和1
+            preSum += nums[i] == 0 ? -1 : 1;
+            //可以把map中已经存在的preSum作为preSum1,当前的总preSum作为preSum2
+            //由于preSum1等于preSum2，所以从preSum1出现的下标的后一位数到当前数的子数组和就为0
+            //此时就可以尝试去更新ans，若大于ans就更新为新的符合条件的子数组的长度
+            if (map.containsKey(preSum)) {
+                ans = Math.max(ans, i - map.get(preSum));
+            } else {
+                //若不存在相同的preSum，就把这个新的preSum存在map中
+                map.put(preSum, i);
+            }
+        }
+        return ans;
+    }
+}
+```
+
+
+
+### [12. 左右两边子数组的和相等](https://leetcode-cn.com/problems/tvdfij/)
+
+```java
+class Solution {
+    public int pivotIndex(int[] nums) {
+        //先计算出数组的和
+        int total = 0;
+        for (int num : nums) {
+            total += num;
+        }
+        //curSum用与存储遍历过程中，从第一个元素到当前元素的所有数的和
+        int curSum = 0;
+        for (int i = 0; i < nums.length; i++) {
+            curSum += nums[i];
+            //curSum - nums[i]为当前数左边的数的和
+            //total - curSum为当前数右边的数的和
+            if (curSum - nums[i] == total - curSum) {
+                return i;
+            }
+        }
+        return -1;
+    }
+}
+```
+
