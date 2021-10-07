@@ -457,3 +457,83 @@ class Solution {
 }
 ```
 
+
+
+### [13. 二维子矩阵的和](https://leetcode-cn.com/problems/O4NDxx/)
+
+```java
+class NumMatrix {
+
+    //声明一个sums数组，行列数分别为m+1，n+1
+    //sums[i + 1][j + 1]表示矩阵从左上角到matrix[i][j]的子矩阵的元素和
+    int[][] sums;
+
+    public NumMatrix(int[][] matrix) {
+        int m = matrix.length;
+        if (m > 0) {
+            int n = matrix[0].length;
+            sums = new int[m + 1][n + 1];
+            for (int i = 0; i < m; i++) {
+                for (int j = 0; j < n; j++) {
+                    //当前的子矩阵总和为左侧和上面的子矩阵总和相加-重复的部分+当前元素
+                    //可以看出sum[i][j]被重复加了一次
+                    sums[i + 1][j + 1] = sums[i][j + 1] + sums[i + 1][j] - sums[i][j] + matrix[i][j];
+                }
+            }
+        }
+    }
+    
+    public int sumRegion(int row1, int col1, int row2, int col2) {
+        //把要减去的，要重新加上的部分做加减就行了
+        return sums[row2 + 1][col2 + 1] - sums[row1][col2 + 1] - sums[row2 + 1][col1] + sums[row1][col1];
+    }
+}
+
+/**
+ * Your NumMatrix object will be instantiated and called as such:
+ * NumMatrix obj = new NumMatrix(matrix);
+ * int param_1 = obj.sumRegion(row1,col1,row2,col2);
+ */
+```
+
+
+
+## 字符串
+
+### [14. 字符串中的变位词](https://leetcode-cn.com/problems/MPnaiL/)
+
+```java
+class Solution {
+    public boolean checkInclusion(String s1, String s2) {
+        //两个长度为26的整数数组，用于表示字符出现的次数
+        int[] arr1 = new int[26];
+        int[] arr2 = new int[26];
+        if (s1.length() > s2.length()) {
+            return false;
+        }
+
+        //第一次循环
+        //统计s1中每个字符出现的次数
+        //同时在s2形成第一个滑动窗口，这个滑动窗口的左侧为s2第一个字符，窗口大小等于s1
+        for (int i = 0; i < s1.length(); i++) {
+            arr1[s1.charAt(i) - 'a']++;
+            arr2[s2.charAt(i) - 'a']++;
+        }
+
+        //遍历s2，逐一对比s2中的滑动窗口与s1的字符出现次数是否相等
+        //若相等就返回true，否则使窗口右移
+        for (int i = s1.length(); i < s2.length(); i++) {
+            if (Arrays.equals(arr1, arr2)) {
+                return true;
+            }
+            //滑动窗口右移，所以需要使得原本窗口最左端的字符的出现次数-1
+            arr2[s2.charAt(i - s1.length()) - 'a']--;
+            arr2[s2.charAt(i) - 'a']++;
+        }
+
+        //判断最后一个滑动窗口是否与arr1相等
+        return Arrays.equals(arr1, arr2);
+    }
+}
+```
+
