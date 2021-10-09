@@ -537,3 +537,75 @@ class Solution {
 }
 ```
 
+
+
+### [15. 字符串中的所有变位词](https://leetcode-cn.com/problems/VabMRr/)
+
+```java
+class Solution {
+    public List<Integer> findAnagrams(String s, String p) {
+        //ans用于保存子串的起始索引
+        List<Integer> ans = new ArrayList<>();
+
+        //用int数组表示p串中每个字符的出现次数
+        int[] need = new int[26];
+        for (int i = 0; i < p.length(); i++) {
+            need[p.charAt(i) - 'a']++;
+        }
+
+        //初始化滑动窗口的左端和右端
+        int start = 0, end = 0;
+        //用window数组表示滑动窗口内每个字符出现的次数
+        int[] window = new int[26];
+        while (end < s.length()) {
+            //上一次循环结束前，我们使得滑动窗口右端右移，所以这里需要把右端的字符的出现次数加上
+            window[s.charAt(end) - 'a']++;
+            //这里有个疑惑的地方：我发现while和if是可以相互替换的，最终都能ac；但是while的速度更快
+            //理论上来说这里用while的话是不会进入第二轮循环的，所以用while的意义不明
+            //若当前的滑动窗口字符个数等于p的字符数，那么当窗口左端右移后，右端不变，while的条件就不成立了
+            while (end - start + 1 == p.length()) {
+                if (Arrays.equals(window, need)) {
+                    ans.add(start);
+                }
+                window[s.charAt(start) - 'a']--;
+                start++;
+            }
+            end++;
+        }
+
+        return ans;
+    }
+}
+```
+
+
+
+### [16. 不含重复字符的最长子字符串](https://leetcode-cn.com/problems/wtcaE1/)
+
+```java
+class Solution {
+    public int lengthOfLongestSubstring(String s) {
+        //用map记录每个字符最后出现的下标
+        Map<Character, Integer> lastIndexForChar = new HashMap<>();
+        //分别声明最长连续子字符串的长度和当前子字符串的长度（皆不含重复字符）
+        int maxSubLen = 0, curSubLen = 0;
+
+        for (int i = 0; i < s.length(); i++) {
+            //取出当前字符上一次出现的下标，若没有就默认为-1
+            int lastIndex = lastIndexForChar.getOrDefault(s.charAt(i), -1);
+            //更新当前字符的最后出现位置
+            lastIndexForChar.put(s.charAt(i), i);
+
+            //如果当前子字符串的长度小于(当前下标-上一次出现的下标)，说明子串中没有出现重复字符，可以使当前长度+1
+            //若大于，则说明出现了重复字符，那么当前子串的最大长度就是i - lastIndex
+            //此外当lastIndex为-1，也即是这个字符第一次出现时，i - lastIndex会使当前子串长度+1（这就是默认字符出现位置为-1的原因）
+            curSubLen = curSubLen < i - lastIndex ? curSubLen + 1 : i - lastIndex;
+            //尝试更新maxSubLen
+            maxSubLen = Math.max(maxSubLen, curSubLen);
+        }
+
+        return maxSubLen;
+    }
+}
+```
+
