@@ -609,3 +609,71 @@ class Solution {
 }
 ```
 
+
+
+### [17. 含有所有字符的最短字符串](https://leetcode-cn.com/problems/M1oyTv/)
+
+```java
+class Solution {
+    public String minWindow(String s, String t) {
+        //排除一些非法情况
+        if (s == null || s.length() == 0 || t == null || t.length() == 0) {
+            return "";
+        }
+        //need数组用于表示每个字符的需要个数
+      	//ASCII码一共有128个
+        int[] need = new int[128];
+        //先遍历t，记录下需要的字符个数
+        for (int i = 0; i < t.length(); i++) {
+            need[t.charAt(i)]++;
+        }
+        //left和right分别是当前滑动窗口的左右边界，size是当前滑动窗口的大小
+        //count是当前需求的字符个数
+        //start是最小覆盖串开始处的下标
+        int left = 0, right = 0, size = Integer.MAX_VALUE, count = t.length(), start = 0;
+        //遍历s字符串
+        while (right < s.length()) {
+            //取出当前右边界的字符
+            char c = s.charAt(right);
+            //need[c]大于0，说明这个字符c在t里面出现了need[c]次
+            //need[c]小于等于0，说明这个字符c在t里面没有出现
+            //当c在t中出现了，说明c可以放入滑动窗口内，并为"凑成覆盖字串"的目标做贡献，我们把count--以表示需要凑的字符数量减1
+            if (need[c] > 0) {
+                count--;
+            }
+            //无论c是否能为最小覆盖字串做贡献，都要对其进行need[c]--操作
+            need[c]--;
+            //当count为0时，说明这个滑动窗口内已经包含了全部t中的字符
+            //这时就要试图把left右移来得到最小的滑动窗口
+            if (count == 0) {
+                //当need[s.charAt(left)] < 0时，说明左边界处的字符没对最小覆盖字串没贡献，也即是说，我们不需要s.charAt(left)
+                //忽略掉这样不需要的字符以得到更小的窗口（即把左边界右移，同时更新need数组）
+                while (left < right && need[s.charAt(left)] < 0) {
+                    need[s.charAt(left)]++;
+                    left++;
+                }
+                //若当前滑动窗口大小小于此前的最小滑动窗口大小，则更新size和start
+                if (right - left + 1 < size) {
+                    size = right - left + 1;
+                    start = left;
+                }
+                //这里讨论下为啥要对need[s.charAt(left)]++和left++
+                //上面的need[c]--操作，这导致了s中所有字符的需要次数都比实际的少1
+                //那么这时的最小滑动窗口的左边界的need值是0，这是因为前面while循环的退出条件是need[s.charAt(left)] < 0
+                //可是左边界的字符的需要次数为1，不然它不可能算在滑动窗口内，所以要对其进行++操作
+                need[s.charAt(left)]++;
+                //左边界右移，这样滑动窗口内肯定不包含t中的所有字符了，一切都要重新计算了
+                left++;
+                //由于左边界只右移了一位，说明只有一个字符不被包含
+                //count++，表示要重新开始凑的字符由0变为1
+                count++;
+            }
+            //右边界右移
+            right++;
+        }
+        //在s中截取start到start+size的字串作为结果返回
+        return size == Integer.MAX_VALUE ? "" : s.substring(start, start + size);
+    }
+}
+```
+
