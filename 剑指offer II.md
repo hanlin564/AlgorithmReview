@@ -677,3 +677,48 @@ class Solution {
 }
 ```
 
+
+
+### [18. 有效的回文](https://leetcode-cn.com/problems/XltzEq/)
+
+```java
+class Solution {
+    public boolean isPalindrome(String s) {
+        //""是回文串
+        if ("".equals(s)) {
+            return true;
+        }
+
+        //定义两个指针指向串的开始和结尾
+        int left = 0, right = s.length() - 1;
+        while (left < right) {
+            //若左右两个指针指向的都不是数组或字母，则需要把它们往中间移动，直到它们都指向字母和数字为止
+            if (!isDigitOrLetter(s.charAt(left))) {
+                left++;
+            } else if (!isDigitOrLetter(s.charAt(right))) {
+                right--;
+            } else {
+                //统一把两个指针指向的字符转为小写再进行比较，若不相同则说明不是回文串，返回false
+                if (Character.toLowerCase(s.charAt(left)) != Character.toLowerCase(s.charAt(right))) {
+                    return false;
+                }
+                //若字符相同则使左右指针往中间移动
+                left++;
+                right--;
+            }
+        }
+
+        //若循环中没返回false，最终默认返回true，说明这个串是回文串
+        return true;
+    }
+
+    //判断一个字符是否为数字或字母
+    private boolean isDigitOrLetter(char c) {
+        if (c >= '0' && c <= '9' || c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z') {
+            return true;
+        }
+        return false;
+    }
+}
+```
+
