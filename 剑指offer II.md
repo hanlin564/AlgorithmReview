@@ -722,3 +722,75 @@ class Solution {
 }
 ```
 
+
+
+### [19. 最多删除一个字符得到回文](https://leetcode-cn.com/problems/RQku0D/)
+
+```java
+class Solution {
+    public boolean validPalindrome(String s) {
+        if ("".equals(s)) {
+            return true;
+        }
+
+        //略过开头结尾所有的回文的部分
+        int left = 0, right = s.length() - 1;
+        while (s.charAt(left) == s.charAt(right) && left < right) {
+            left++;
+            right--;
+        }
+
+        /**
+         * 上面循环退出有两种情况
+         * 第一种情况下退出，说明左右指针指向的字符不相等了；这时跳过左指针或右指针，去判断剩余的区间是否为回文串
+         * 第二种情况下退出，说明左右指针指向了同一字符，s自身就是回文串，不需要删除字符
+         */
+        return left == s.length() / 2 || isPalindrome(s, left + 1, right) || isPalindrome(s, left, right - 1);
+    }
+
+    //判断s串从left到right的子串是否为回文串
+    private boolean isPalindrome(String s, int left, int right) {
+        while (left < right) {
+            if (s.charAt(left) != s.charAt(right)) {
+                return false;
+            }
+            left++;
+            right--;
+        }
+        return true;
+    }
+}
+```
+
+
+
+### [20. 回文子字符串的个数](https://leetcode-cn.com/problems/a7VOhD/)
+
+```java
+class Solution {
+    int ans=0;
+
+    public int countSubstrings(String s) {
+        for (int i = 0; i < s.length(); i++) {
+            //回文子串长度为奇数(以一个字符为中心)
+            extendSubstrings(s, i, i);
+            //回文子串长度为偶数(以两个字符为中心)
+            extendSubstrings(s, i, i+1);
+        }
+        return ans;
+    }
+
+    //中心扩展
+    public void extendSubstrings(String s,int start,int end){
+        //使ans++,且使回文子串前后都增加一个字符的条件:
+        //1.回文子串的开始和结束位置在s字符串内
+        //2.前后的字符是相同的
+        while (start>=0 && end<s.length() && s.charAt(start)==s.charAt(end)) {
+            start--;
+            end++;
+            ans++;
+        }
+    }
+}
+```
+
