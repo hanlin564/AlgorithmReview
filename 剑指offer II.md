@@ -823,3 +823,82 @@ class Solution {
 }
 ```
 
+
+
+### [22. 链表中环的入口节点](https://leetcode-cn.com/problems/c32eOV/)
+
+```java
+/**
+ * Definition for singly-linked list.
+ * class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) {
+ *         val = x;
+ *         next = null;
+ *     }
+ * }
+ */
+public class Solution {
+    public ListNode detectCycle(ListNode head) {
+        //把链表分为环部分（b）和非环部分（a）,a与b指对应部分的链表长度（节点数）
+        //快慢指针
+        ListNode fast = head, slow = head;
+        while (true) {
+            if (fast == null || fast.next == null) {
+                return null;
+            }
+            //fast移动两位，slow移动一位
+            fast = fast.next.next;
+            slow = slow.next;
+            //当slow和fast第一次相遇时，肯定在环里面
+            //此时slow走了n*b步（？）
+          	//快指针走的步数f=2*慢指针走的步数s（f=2*s）
+          	//f=s+n*b，快指针和慢指针在环中相遇，说明快指针比慢指针多走环长度的整数倍
+          	//2*s=s+n*b得出s=n*b
+            if (fast == slow) {
+                break;
+            }
+        }
+        //容易知道当slow走了a+nb步时都是在入环的第一个节点处
+        //那么让fast重新指向head，slow和fast同时一格格移动
+        //当两者再次相遇时，fast走了a步（从head到入环处），slow也走了nb+a步
+        //相遇处就是入环处
+        fast = head;
+        while (slow != fast) {
+            slow = slow.next;
+            fast = fast.next;
+        }
+        return fast;
+    }
+}
+```
+
+
+
+### [23. 两个链表的第一个重合节点](https://leetcode-cn.com/problems/3u1WK4/)
+
+```java
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) {
+ *         val = x;
+ *         next = null;
+ *     }
+ * }
+ */
+public class Solution {
+    public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
+        ListNode a = headA, b = headB;
+        while (a != b) {
+            a = a == null ? headB : a.next;
+            b = b == null ? headA : b.next;
+        }
+        return a;
+    }
+}
+```
+
