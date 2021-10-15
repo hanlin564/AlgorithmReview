@@ -794,3 +794,32 @@ class Solution {
 }
 ```
 
+
+
+## 链表
+
+### [21. 删除链表的倒数第N个节点](https://leetcode-cn.com/problems/SLwz0R/)
+
+```java
+class Solution {
+    public ListNode removeNthFromEnd(ListNode head, int n) {
+        ListNode fast = head, slow = head;
+        for (int i = 0; i < n; i++) {
+            fast = fast.next;
+        }
+
+        while (fast != null && fast.next != null) {
+            fast = fast.next;
+            slow = slow.next;
+        }
+
+        if (fast == null) {
+            return head.next;
+        } else {
+            slow.next = slow.next.next;
+            return head;
+        }
+    }
+}
+```
+
