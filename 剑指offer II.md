@@ -902,3 +902,176 @@ public class Solution {
 }
 ```
 
+
+
+### [24. 反转链表](https://leetcode-cn.com/problems/UHnkqh/)
+
+迭代法：
+
+```java
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode() {}
+ *     ListNode(int val) { this.val = val; }
+ *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+ * }
+ */
+class Solution {
+    public ListNode reverseList(ListNode head) {
+        ListNode cur = head;
+        ListNode ans = null;
+        while (cur != null) {
+            ListNode nextTmp = cur.next;
+            cur.next = ans;
+            ans = cur;
+            cur = nextTmp;
+        }
+        return ans;
+    }
+}
+```
+
+递归法：
+
+```java
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) { val = x; }
+ * }
+ */
+class Solution {
+    public ListNode reverseList(ListNode head) {
+        if(head==null || head.next==null)
+            return head;
+        ListNode result = reverseList(head.next);
+        head.next.next=head;
+        head.next=null;
+        return result;
+    }
+}
+```
+
+
+
+### [25. 链表中的两数相加](https://leetcode-cn.com/problems/lMSNwu/)
+
+```java
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode() {}
+ *     ListNode(int val) { this.val = val; }
+ *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+ * }
+ */
+class Solution {
+    public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
+      //分别为两个链表创建栈
+        Stack<Integer> stack1 = buildStack(l1);
+        Stack<Integer> stack2 = buildStack(l2);
+      //创建一个虚的头节点
+        ListNode dummy = new ListNode();
+      //carry表示相加的进位，初始化为0
+        int carry = 0;
+      
+        while (!stack1.isEmpty() || !stack2.isEmpty() || carry != 0) {
+          //取得两个栈顶部的值并相加，计算进位和当前位的值
+            int x = stack1.isEmpty() ? 0 : stack1.pop();
+            int y = stack2.isEmpty() ? 0 : stack2.pop();
+            int sum = x + y + carry;
+          //当前节点值为sum对10取余，进位为整除10
+            ListNode node = new ListNode(sum % 10);
+            carry = sum / 10;
+          //把新创建的节点插入到dummy节点之后
+            node.next = dummy.next;
+            dummy.next = node;
+        }
+      
+        return dummy.next;
+    }
+
+  //根据链表去创建一个栈，从栈底到栈顶依次是链表头部的值到链表尾部的值
+    private Stack<Integer> buildStack(ListNode listNode) {
+        Stack<Integer> stack = new Stack<>();
+        while (listNode != null) {
+            stack.push(listNode.val);
+            listNode = listNode.next;
+        }
+        return stack;
+    }
+}
+```
+
+
+
+### [26. 重排链表](https://leetcode-cn.com/problems/LGjMqU/)
+
+```java
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode() {}
+ *     ListNode(int val) { this.val = val; }
+ *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+ * }
+ */
+class Solution {
+    public void reorderList(ListNode head) {
+        //反转链表的后一半，再与前一半合并
+        ListNode mid = getMiddle(head);
+        ListNode a = head;
+        ListNode b = mid.next;
+        mid.next = null;
+        mergeList(a, reverseList(b));
+    }
+
+    //找到链表的中点
+    private ListNode getMiddle(ListNode head) {
+        ListNode slow = head;
+        ListNode fast = head;
+        while (fast.next != null && fast.next.next != null) {
+            fast = fast.next.next;
+            slow = slow.next;
+        }
+        return slow;
+    }
+
+    //反转链表
+    private ListNode reverseList(ListNode head) {
+        ListNode cur = head;
+        ListNode ans = null;
+        while (cur != null) {
+            ListNode nextTmp = cur.next;
+            cur.next = ans;
+            ans = cur;
+            cur = nextTmp;
+        }
+        return ans;
+    }
+
+    //合并两个链表
+    //a和b交错合并，a的头节点为合并结果的头节点
+    private void mergeList(ListNode a, ListNode b) {
+        ListNode aTmp, bTmp;
+        while (a != null && b != null) {
+            aTmp = a.next;
+            bTmp = b.next;
+            a.next = b;
+            a = aTmp;
+            b.next = a;
+            b = bTmp;
+        }
+    }
+}
+```
+
