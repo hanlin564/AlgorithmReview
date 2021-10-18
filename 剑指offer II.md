@@ -1238,6 +1238,168 @@ class Solution {
         cur.next = new Node(insertVal, cur.next);
         return head;
     }
-}i
+}
+```
+
+
+
+## 哈希表
+
+### [30. 插入、删除和随机访问都是O(1)的容器](https://leetcode-cn.com/problems/FortPu/)
+
+```java
+class RandomizedSet {
+
+    /**
+     * indexForNums存储每个数在list中的下标
+     * list为动态数组，存储元素值.使用list的原因是单单map无法通过随机数来取值
+     * random用于随机取值
+     */
+    Map<Integer, Integer> indexForNums;
+    List<Integer> list;
+    Random random = new Random();
+
+    /** Initialize your data structure here. */
+    public RandomizedSet() {
+        indexForNums = new HashMap<>();
+        list = new ArrayList<>();
+    }
+    
+    /** Inserts a value to the set. Returns true if the set did not already contain the specified element. */
+    public boolean insert(int val) {
+        //若容器中已存在val，就返回false
+        if (indexForNums.containsKey(val)) {
+            return false;
+        }
+
+        //把val放在数组最后，并更新indexForNums中的映射
+        indexForNums.put(val, list.size());
+        list.add(list.size(), val);
+        return true;
+    }
+    
+    /** Removes a value from the set. Returns true if the set contained the specified element. */
+    public boolean remove(int val) {
+        //若容器中不存在val，就返回false
+        if (!indexForNums.containsKey(val)) {
+            return false;
+        }
+
+        //把val与list中最后一个数做交换，然后删除最后一个数
+        int lastNum = list.get(list.size() - 1);
+        int index = indexForNums.get(val);
+        list.set(index, lastNum);
+        indexForNums.put(lastNum, index);
+        list.remove(list.size() - 1);
+        indexForNums.remove(val);
+        return true;
+    }
+    
+    /** Get a random element from the set. */
+    public int getRandom() {
+        //因为用了数组存储值，所以可以根据随机数来随机获取容器中的值
+        return list.get(random.nextInt(list.size()));
+    }
+}
+
+/**
+ * Your RandomizedSet object will be instantiated and called as such:
+ * RandomizedSet obj = new RandomizedSet();
+ * boolean param_1 = obj.insert(val);
+ * boolean param_2 = obj.remove(val);
+ * int param_3 = obj.getRandom();
+ */
+```
+
+
+
+### [31. 最少最近使用缓存](https://leetcode-cn.com/problems/FortPu/)
+
+```java
+class LRUCache {
+
+    class Node {
+        int key;
+        int value;
+        Node next, prev;
+        Node() {}
+        Node(int key, int value) {
+            this.key = key;
+            this.value = value;
+        }
+    }
+
+    Node head, tail;
+    Map<Integer, Node> cache;
+    int capacity, size;
+
+    public LRUCache(int capacity) {
+        this.capacity = capacity;
+        size = 0;
+        cache = new HashMap<>();
+        head = new Node();
+        tail = new Node();
+        head.next = tail;
+        tail.prev = head;
+    }
+    
+    public int get(int key) {
+        Node node = cache.get(key);
+        if (node == null) {
+            return -1;
+        } else {
+            moveToHead(node);
+            return node.value;
+        }
+    }
+    
+    public void put(int key, int value) {
+        Node node = cache.get(key);
+        if (node == null) {
+            node = new Node(key, value);
+            cache.put(key, node);
+            addToHead(node);
+            size++;
+            if (size > capacity) {
+                Node tail = removeTail();
+                cache.remove(tail.key);
+                size--;
+            }
+        } else {
+            node.value = value;
+            moveToHead(node);
+        }
+    }
+
+    private void moveToHead(Node node) {
+        removeNode(node);
+        addToHead(node);
+    }
+
+    private void addToHead(Node node) {
+        node.prev = head;
+        node.next = head.next;
+        head.next = node;
+        node.next.prev = node;
+    }
+
+    private void removeNode(Node node) {
+        node.prev.next = node.next;
+        node.next.prev = node.prev;
+    }
+
+    private Node removeTail() {
+        Node oldTail = tail.prev;
+        removeNode(oldTail);
+        return oldTail;
+    }
+}
+
+/**
+ * Your LRUCache object will be instantiated and called as such:
+ * LRUCache obj = new LRUCache(capacity);
+ * int param_1 = obj.get(key);
+ * obj.put(key,value);
+ */
 ```
 
