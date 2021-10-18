@@ -1075,3 +1075,169 @@ class Solution {
 }
 ```
 
+
+
+### [27. 回文链表](https://leetcode-cn.com/problems/aMhZSa/)
+
+```java
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode() {}
+ *     ListNode(int val) { this.val = val; }
+ *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+ * }
+ */
+class Solution {
+    public boolean isPalindrome(ListNode head) {
+        if (head == null || head.next == null) {
+            return true;
+        }
+        ListNode slow = head, fast = head;
+        while (fast != null && fast.next != null) {
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        //fast == null:偶数节点，slow指向两个中间节点靠后的那一个
+        //fast != null:奇数节点，slow指向唯一的中间节点
+        cut(head, slow);
+      //先把链表前后两半拆开，再翻转后一半，最后判断节点值是否相等
+        return isEqual(head, reverseList(slow));
+    }
+
+  //反转链表
+    private ListNode reverseList(ListNode head) {
+        ListNode res = null;
+        ListNode cur = head;
+        while (cur != null) {
+            ListNode nextTmp = cur.next;
+            cur.next = res;
+            res = cur;
+            cur = nextTmp;
+        }
+        return res;
+    }
+
+  //判断两个链表的节点值是否相等，当两个链表的节点数相差在1之内，对结果不会有影响
+    private boolean isEqual(ListNode headA, ListNode headB) {
+        while (headA != null && headB != null) {
+            if (headA.val != headB.val) {
+                return false;
+            }
+            headA = headA.next;
+            headB = headB.next;
+        }
+        return true;
+    }
+    
+  //断开以head为头节点的链表中cutNode之后（包括）的部分
+    private void cut(ListNode head, ListNode cutNode) {
+        while (head.next != cutNode) {
+            head = head.next;
+        }
+        head.next = null;
+    }
+}
+```
+
+
+
+### [28. 展平多级双向链表](https://leetcode-cn.com/problems/Qv1Da2/)
+
+```java
+/*
+// Definition for a Node.
+class Node {
+    public int val;
+    public Node prev;
+    public Node next;
+    public Node child;
+};
+*/
+
+class Solution {
+  //抄的题解，用dfs做的，代码不难，但是我根本是题都看不懂
+    List<Node> list = new ArrayList<>();
+
+    public Node flatten(Node head) {
+        dfs(head);
+        for (int i = 0; i < list.size() - 1; i++) {
+            Node pre = list.get(i);
+            Node cur = list.get(i + 1);
+            cur.prev = pre;
+            pre.next = cur;
+            pre.child = null;
+        }
+        return head;
+    }
+
+    private void dfs(Node head) {
+        if (head == null) return;
+        list.add(head);
+        dfs(head.child);
+        dfs(head.next);
+    }
+}
+```
+
+
+
+### [29. 排序的循环链表](https://leetcode-cn.com/problems/4ueAj6/)
+
+```java
+/*
+// Definition for a Node.
+class Node {
+    public int val;
+    public Node next;
+
+    public Node() {}
+
+    public Node(int _val) {
+        val = _val;
+    }
+
+    public Node(int _val, Node _next) {
+        val = _val;
+        next = _next;
+    }
+};
+*/
+
+class Solution {
+    public Node insert(Node head, int insertVal) {
+        //当链表头为null，就以insertVal创建head节点并使head的后继指向自身（循环链表），然后返回head
+        if (head == null) {
+            head = new Node(insertVal);
+            head.next = head;
+            return head;
+        }
+
+        //遍历循环链表
+        Node cur = head;
+        while (cur.next != head) {
+            //若后继节点的节点值小于当前节点值，说明当前节点是循环链表的尾部
+            if (cur.next.val < cur.val) {
+                //比最小的还小、比最大的还大这两种情况都可插入
+                if (cur.next.val >= insertVal) {
+                    break;
+                } else if (cur.val <= insertVal) {
+                    break;
+                }
+            }
+            //在链表中间找到了插入的位置
+            if (cur.val <= insertVal && cur.next.val >= insertVal) {
+                break;
+            }
+            cur = cur.next;
+        }
+
+        //把新节点创建并插入，最后返回head
+        cur.next = new Node(insertVal, cur.next);
+        return head;
+    }
+}i
+```
+
