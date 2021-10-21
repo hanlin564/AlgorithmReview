@@ -1403,3 +1403,140 @@ class LRUCache {
  */
 ```
 
+
+
+### [32. 有效的变位词](https://leetcode-cn.com/problems/dKk3P7/)
+
+```java
+class Solution {
+    public boolean isAnagram(String s, String t) {
+        //若两字符串长度不等，则一定不是互为变位词
+        //若两字符串的相等，说明它们的字符顺序完全相同，不是变位词
+        if (s.length() != t.length() || s.equals(t)) {
+            return false;
+        }
+
+        //使用counts数组统计每个小写字母出现的次数
+        int[] counts = new int[26];
+
+        //先统计s的字符出现次数，再对t中出现字符做减法
+        for (char c : s.toCharArray()) {
+            counts[c - 'a']++;
+        }
+        for (char c : t.toCharArray()) {
+            counts[c - 'a']--;
+        }
+        //减去t中字符出现次数后，最终若有字符出现次数不为0，说明两个字符串有同个字符出现不同次数的情况，不是变位词
+        for (int count : counts) {
+            if (count != 0) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+}
+```
+
+
+
+### [33. 变位词组](https://leetcode-cn.com/problems/sfvd7V/)
+
+```java
+class Solution {
+    public List<List<String>> groupAnagrams(String[] strs) {
+        //同变位词的字符排序后生成的string -> 存储同变位词的数组
+        Map<String, ArrayList<String>> map = new HashMap<>();
+        for (String str : strs) {
+            //把当前字符串转为字符数组并排序，再用排序后的字符数组去创建一个名为key的字符串
+            char[] array = str.toCharArray();
+            Arrays.sort(array);
+            String key = new String(array);
+            //所有当前字符的变位词的key都是一样的，所以可以通过key来定位map中存储了所有当前字符变位词的数组
+            //若没有目标数组就new一个
+            ArrayList<String> list = map.getOrDefault(key, new ArrayList<>());
+            //把当前字符串加入到存储它的变位词的数组中
+            list.add(str);
+            map.put(key, list);
+        }
+        //把map的所有值都转化为题目要求的嵌套数组
+        return new ArrayList<List<String>>(map.values());
+    }
+}
+```
+
+
+
+### [34. 外星语言是否排序](https://leetcode-cn.com/problems/lwyVBB/)
+
+```java
+class Solution {
+    public boolean isAlienSorted(String[] words, String order) {
+        //orderIndex数组用于统计26个小写字母在外星语中的字母顺序
+        //比如a在外星语中的顺序是2，则orderIndex[0]=2
+        int[] orderIndex = new int[26];
+        for (int i = 0; i < 26; i++) {
+            orderIndex[order.charAt(i) - 'a'] = i;
+        }
+
+        //遍历单词序列，两两对比单词
+        for (int i = 0; i < words.length - 1; i++) {
+            char[] word1 = words[i].toCharArray();
+            char[] word2 = words[i + 1].toCharArray();
+            //同时开始遍历两个单词，判断两个单词同一个位置的字母的字典序大小
+            for (int j = 0; j < Math.max(word1.length, word2.length); j++) {
+                //若其中一个单词已经遍历到头了（j >= word.length），就把对应的index置为-1，代表这个单词的顺序一定不会大于另一个
+                //若没有遍历到头，就从orderIndex中取出当前字母在外星语中对应的顺序
+                int index1 = j >= word1.length ? -1 : orderIndex[word1[j] - 'a'];
+                int index2 = j >= word2.length ? -1 : orderIndex[word2[j] - 'a'];
+                //若index1小于index2，说明两个单词当前指向字母是符合字典序的，退出循环，进行下一轮对比
+                //否则说明是不符合字典序的，直接返回false
+                //若相等就继续进行循环，进行下一个字母的对比
+                if (index1 < index2) {
+                    break;
+                }
+                if (index1 > index2) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+}
+```
+
+
+
+### [35. 最小时间差](https://leetcode-cn.com/problems/569nqc/)
+
+```java
+class Solution {
+    public int findMinDifference(List<String> timePoints) {
+        //如果时间点总数超过24*60说明肯定有重复，返回0
+        if (timePoints.size() > 24 * 60) {
+            return 0;
+        }
+
+        //把每个时间点都转换为分钟的形式，加入到数组中，并从小到大排序
+        List<Integer> minutes = new ArrayList<>();
+        for (String timePoint : timePoints) {
+            String[] time = timePoint.split(":");
+            minutes.add(Integer.parseInt(time[0]) * 60 + Integer.parseInt(time[1]));
+        }
+        Collections.sort(minutes);
+
+        //把最小值加上24*60以处理答案是最大和最小值的差值的情况
+        minutes.add(minutes.get(0) + 24 * 60);
+
+        //逐一对比两个相邻时间的差并尝试更新最小差值
+        int res = 24 * 60;
+        for (int i = 1; i < minutes.size(); i++) {
+            res = Math.min(res, minutes.get(i) - minutes.get(i - 1));
+        }
+
+        return res;
+    }
+}
+```
+
