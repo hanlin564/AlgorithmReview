@@ -1540,3 +1540,93 @@ class Solution {
 }
 ```
 
+
+
+## 栈
+
+### [36. 后缀表达式](https://leetcode-cn.com/problem-list/e8X3pBZi/)
+
+````java
+class Solution {
+    public int evalRPN(String[] tokens) {
+        //用栈来存储这些数
+        Stack<Integer> stack = new Stack<>();
+        //遍历tokens数组
+        for (String token : tokens) {
+            //判断当前字符是数字还是运算符
+            if ("+".equals(token) || "-".equals(token) || "*".equals(token) || "/".equals(token)) {
+                //是运算符号，就把栈顶两个数弹出来做相应的运算并把结果入栈
+                int num2 = stack.pop();
+                int num1 = stack.pop();
+                switch (token) {
+                    case "+": {
+                        stack.push(num1 + num2);
+                        break;
+                    }
+                    case "-": {
+                        stack.push(num1 - num2);
+                        break;
+                    }
+                    case "*": {
+                        stack.push(num1 * num2);
+                        break;
+                    }
+                    case "/": {
+                        stack.push(num1 / num2);
+                        break;
+                    }
+                }
+            } else {
+                //是数字，就把数字压入栈
+                stack.push(Integer.valueOf(token));
+            }
+        }
+        //栈顶作为结果返回，此时栈中也只有一个数了
+        return stack.peek();
+    }
+}
+````
+
+
+
+### [37. 小行星碰撞](https://leetcode-cn.com/problems/XagZNi/)
+
+```java
+class Solution {
+    public int[] asteroidCollision(int[] asteroids) {
+        //栈用于存放从左到右遍历过程中没爆炸的小行星
+        Stack<Integer> stack = new Stack<>();
+
+        //index用于控制asteroids数组的遍历
+        int index = 0;
+        while (index < asteroids.length) {
+            //把当前数入栈的条件有三
+            //1：栈为空
+            //2：栈顶小于0。若当前数小于0，一起向左移动；若当前数大于0，反向移动
+            //3：当前数大于0。若栈顶小于0，反向移动；若栈顶大于0，一起向右移动
+            if (stack.empty() || stack.peek() < 0 || asteroids[index] > 0) {
+                stack.push(asteroids[index]);
+            } else if (stack.peek() <= -asteroids[index]) {
+                //若栈顶等于当前数的绝对值，且栈顶大于0，当前数小于0，两者会一起爆炸
+                //这种情况就让栈顶出栈，并让index跳过当前数
+
+                //若栈顶小于当前数的绝对值，且栈顶大于0，当前数小于0，栈顶元素会爆炸
+                //当前数继续与下一个栈顶做对比（index不变），跳过这次循环
+                if (stack.pop() < -asteroids[index]) {
+                    continue;
+                }
+            }
+            //当前数被撞毁，直接来到这里了，上面的else if块是不会进入的
+            index++;
+        }
+
+        //把栈中的数放入数组中返回
+        int[] ans = new int[stack.size()];
+        for (int i = ans.length - 1; i >= 0; i--) {
+            ans[i] = stack.pop();
+        }
+        return ans;
+    }
+}
+```
+
