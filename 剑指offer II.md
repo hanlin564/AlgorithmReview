@@ -1630,3 +1630,37 @@ class Solution {
 }
 ```
 
+
+
+### [38.每日温度](https://leetcode-cn.com/problems/iIQa4I/)
+
+```java
+class Solution {
+    public int[] dailyTemperatures(int[] temperatures) {
+        int n = temperatures.length;
+        //存储答案的数组
+        int[] ans = new int[n];
+        //栈:用于存储原数组中的下标
+        //顺序:从栈底到栈顶升序
+        //如果一个下标在单调栈里，则表示尚未找到下一次温度更高的下标
+        Stack<Integer> indexs = new Stack<>();
+        //顺序遍历数组
+        for (int curIndex = 0; curIndex < n; curIndex++) {
+            //如果当前元素比栈顶中的元素要大
+            //再次遍历,计算当前元素和栈顶元素中间每个下标应该保存的天数
+            //循环条件:当前元素大于栈顶元素且栈不为空
+            while (!indexs.isEmpty() && temperatures[curIndex] > temperatures[indexs.peek()]) {
+                //栈中可能保存了很多小于当前温度的下标(栈底到栈顶从低到高)
+                //通过遍历(下标从后往前)把这些下标逐一出栈,同时更新preIndex的下标(逐渐变小)
+                int preIndex = indexs.pop();
+                //ans[preIndex]逐渐变大
+                ans[preIndex] = curIndex - preIndex;
+            }
+            //把数组下标入栈
+            indexs.add(curIndex);
+        }
+        return ans;
+    }
+}
+```
+
