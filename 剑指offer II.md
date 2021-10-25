@@ -1664,3 +1664,127 @@ class Solution {
 }
 ```
 
+
+
+### [39. 直方图最大矩形面积](https://leetcode-cn.com/problems/0ynMMM/)
+
+https://leetcode-cn.com/problems/largest-rectangle-in-histogram/solution/bao-li-jie-fa-zhan-by-liweiwei1419/
+
+```java
+class Solution {
+    public int largestRectangleArea(int[] heights) {
+        int len = heights.length;
+        if (len == 1) {
+            return heights[0];
+        }
+
+        //下面这些扩大数组并把首末元素都赋值为0的操作是为了方便计算
+        //想象柱状图的左右两侧各有一个高度为0的柱子
+        //这样就算是最低的柱子也能通过下面的循环计算出最大面积
+        int res = 0;
+        int[] newHeights = new int[len + 2];
+        newHeights[0] = 0;
+        System.arraycopy(heights, 0, newHeights, 1, len);
+        newHeights[len + 1] = 0;
+        len += 2;
+        heights = newHeights;
+
+        //这个栈存放的是数组从左到右的下标，且栈底到栈顶保持不严格递增（单调栈）
+        //这里说下为什么要用ArrayDeque而不直接用Stack
+        //因为Stack默认是动态数组Vector实现的，会有扩容和加锁导致速度下降
+        //而ArrayDeque可以指定初始化多大的数组
+        Deque<Integer> deque = new ArrayDeque<>(len);
+        deque.addLast(0);
+
+        for (int i = 1; i < len; i++) {
+            //由于这是单调栈，所以栈顶下面的柱长肯定不大于栈顶；而heights[i]又小于栈顶，
+            //所以可以确定heights[stack.peekLast()]对应的最大面积的矩形
+            //若当前元素小于栈顶下标对应的元素，我们就可以确定从栈顶下标到当前下标的矩形面积
+            while (heights[i] < heights[deque.peekLast()]) {
+                int curHeight = heights[deque.pollLast()];
+                int curWidth = i - deque.peekLast() - 1;//由于矩形宽度不包括i，所以要-1
+                res = Math.max(res, curHeight * curWidth); //与res做对比，取大的那个
+            }
+            deque.addLast(i);
+        }
+
+        return res;
+    }
+}
+```
+
+
+
+### [40. 矩阵中最大的矩形](https://leetcode-cn.com/problems/PLYXKQ/)
+
+```java
+class Solution {
+    public int maximalRectangle(String[] matrix) {
+        if (matrix.length == 0) {
+            return 0;
+        }
+
+        //这里的height是从上往下算的，且它代表之前遍历的行到当前行连续'1'的个数
+        //'0'就是heights中的空气部分，'1'就是heights中的柱形部分
+        //维护heights，把值传给largestRectangleArea计算就行
+        int[] heights = new int[matrix[0].length()];
+        //保存临时的最大矩形面积
+        int maxArea = 0;
+
+        for (int row = 0; row < matrix.length; row++) {
+            for (int col = 0; col < matrix[0].length(); col++) {
+                //若出现'0'，就把height重置为0
+                //计算连续'1'的个数
+                if (matrix[row].charAt(col) == '1') {
+                    heights[col] += 1;
+                } else {
+                    heights[col] = 0;
+                }
+            }
+            maxArea = Math.max(maxArea, largestRectangleArea(heights));
+        }
+
+        return maxArea;
+    }
+
+    private int largestRectangleArea(int[] heights) {
+        int len = heights.length;
+        if (len == 1) {
+            return heights[0];
+        }
+
+        //下面这些扩大数组并把首末元素都赋值为0的操作是为了方便计算
+        //想象柱状图的左右两侧各有一个高度为0的柱子
+        //这样就算是最低的柱子也能通过下面的循环计算出最大面积
+        int res = 0;
+        int[] newHeights = new int[len + 2];
+        newHeights[0] = 0;
+        System.arraycopy(heights, 0, newHeights, 1, len);
+        newHeights[len + 1] = 0;
+        len += 2;
+        heights = newHeights;
+
+        //这个栈存放的是数组从左到右的下标，且栈底到栈顶保持不严格递增（单调栈）
+        //这里说下为什么要用ArrayDeque而不直接用Stack
+        //因为Stack默认是动态数组Vector实现的，会有扩容和加锁导致速度下降
+        //而ArrayDeque可以指定初始化多大的数组
+        Deque<Integer> deque = new ArrayDeque<>(len);
+        deque.addLast(0);
+
+        for (int i = 1; i < len; i++) {
+            //由于这是单调栈，所以栈顶下面的柱长肯定不大于栈顶；而heights[i]又小于栈顶，
+            //所以可以确定heights[stack.peekLast()]对应的最大面积的矩形
+            //若当前元素小于栈顶下标对应的元素，我们就可以确定从栈顶下标到当前下标的矩形面积
+            while (heights[i] < heights[deque.peekLast()]) {
+                int curHeight = heights[deque.pollLast()];
+                int curWidth = i - deque.peekLast() - 1;//由于矩形宽度不包括i，所以要-1
+                res = Math.max(res, curHeight * curWidth); //与res做对比，取大的那个
+            }
+            deque.addLast(i);
+        }
+
+        return res;
+    }
+}
+```
+
