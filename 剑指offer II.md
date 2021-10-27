@@ -1788,3 +1788,154 @@ class Solution {
 }
 ```
 
+
+
+## 队列
+
+### [41. 滑动窗口的平均值](https://leetcode-cn.com/problems/qIsx9U/)
+
+```java
+class MovingAverage {
+
+    /**
+     * length：滑动窗口大小
+     * queue：存储滑动窗口中的元素的队列，队头存放滑动窗口的最左侧元素，队尾存放滑动窗口的最右侧元素
+     * sum：存放滑动窗口中元素的和
+     */
+    private int length;
+    private Queue<Integer> queue;
+    private double sum = 0;
+
+    /** Initialize your data structure here. */
+    public MovingAverage(int size) {
+        length = size;
+        queue = new LinkedList<>();
+        sum = 0;
+    }
+    
+    public double next(int val) {
+        //先检查滑动窗口中元素个数是否等于窗口大小，若相等就让队头出队，并让sum减去这个出队的值
+        if (queue.size() == length) {
+            sum -= queue.poll();
+        }
+        //后续加入的元素入队，并使sum加上这个新的值
+        queue.add(val);
+        sum += val;
+        //计算此时滑动窗口的平均值，注意是除以队列的长度而不是滑动窗口大小
+        return sum / queue.size();
+    }
+}
+
+/**
+ * Your MovingAverage object will be instantiated and called as such:
+ * MovingAverage obj = new MovingAverage(size);
+ * double param_1 = obj.next(val);
+ */
+```
+
+
+
+### [42. 最近请求次数](https://leetcode-cn.com/problems/H8086Q/)
+
+```java
+class RecentCounter {
+
+    /**
+     * queue：用于存储请求的队列
+     * 队头存储较早的请求，队尾存储最新的请求
+     */
+    private Queue<Integer> queue;
+
+    public RecentCounter() {
+        queue = new LinkedList<>();
+    }
+    
+    public int ping(int t) {
+        //最新的请求入队
+        queue.add(t);
+        //通过while循环使最新请求3000毫秒之前的请求都出队
+        while (queue.peek() < t - 3000) {
+            queue.poll();
+        }
+        //此时队列中的元素个数就是[t-3000, t]区间的请求个数
+        return queue.size();
+    }
+}
+
+/**
+ * Your RecentCounter object will be instantiated and called as such:
+ * RecentCounter obj = new RecentCounter();
+ * int param_1 = obj.ping(t);
+ */
+```
+
+
+
+### [43. 往完全二叉树添加节点](https://leetcode-cn.com/problems/NaqhDT/)
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class CBTInserter {
+
+    List<TreeNode> list;
+
+    public CBTInserter(TreeNode root) {
+        //按层序遍历把给定完全二叉树的节点存在list中
+        list = new ArrayList<>();
+        Queue<TreeNode> queue = new ArrayDeque<>();
+        queue.offer(root);
+        while (!queue.isEmpty()) {
+            TreeNode node = queue.poll();
+            list.add(node);
+            if (node.left != null) {
+                queue.offer(node.left);
+            }
+            if (node.right != null) {
+                queue.offer(node.right);
+            }
+        }
+    }
+    
+    public int insert(int v) {
+        //用传入的值创建一个新的节点并插入到数组之后
+        TreeNode node = new TreeNode(v);
+        list.add(node);
+        //通过list.size() / 2 - 1得到父节点的编号
+        //父节点编号=子节点编号/2，但是这里的list.size()比子节点编号大1，所以要减1
+        int parentIndex = list.size() / 2 - 1;
+        //判断下是插入到左子树还是右子树
+        if (list.size() % 2 == 0) {
+            list.get(parentIndex).left = node;
+        } else {
+            list.get(parentIndex).right = node;
+        }
+        return list.get(parentIndex).val;
+    }
+    
+    public TreeNode get_root() {
+        return list.get(0);
+    }
+}
+
+/**
+ * Your CBTInserter object will be instantiated and called as such:
+ * CBTInserter obj = new CBTInserter(root);
+ * int param_1 = obj.insert(v);
+ * TreeNode param_2 = obj.get_root();
+ */
+```
+
