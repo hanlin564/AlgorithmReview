@@ -1939,3 +1939,151 @@ class CBTInserter {
  */
 ```
 
+
+
+### [44. 二叉树每层的最大值](https://leetcode-cn.com/problems/hPov7L/)
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    public List<Integer> largestValues(TreeNode root) {
+        List<Integer> res = new ArrayList<>();
+        Queue<TreeNode> queue = new LinkedList<>();
+
+        if (root == null) {
+            return res;
+        }
+        queue.offer(root);
+
+        //层序遍历
+        //记录每一层的最大值，初始值为这层最左侧的值，并与这一层的其它节点做比对
+        //求出这一层的最大值，然后插入到数组中
+        while (!queue.isEmpty()) {
+            int max = queue.peek().val;
+
+            for (int i = queue.size(); i > 0; i--) {
+                TreeNode node = queue.poll();
+                max = max > node.val ? max : node.val;
+                if (node.left != null) {
+                    queue.offer(node.left);
+                }
+                if (node.right != null) {
+                    queue.offer(node.right);
+                }
+            }
+
+            res.add(max);
+        }
+
+        return res;
+    }
+}
+```
+
+
+
+### [45. 二叉树最底层最左边的值](https://leetcode-cn.com/problems/LwUNpT/)
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    public int findBottomLeftValue(TreeNode root) {
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.add(root);
+
+        /**
+         * 依然是层序遍历，不过是反向层序遍历，也就是每层是从右到左的顺序
+         * 等层序遍历结束，root指向的就是最底层最左侧的节点
+         */
+        while (!queue.isEmpty()) {
+            root = queue.poll();
+            if (root.right != null) {
+                queue.offer(root.right);
+            }
+            if (root.left != null) {
+                queue.offer(root.left);
+            }
+        }
+
+        return root.val;
+    }
+}
+```
+
+
+### [46. 二叉树的右侧视图](https://leetcode-cn.com/problems/WNC0Lk/)
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    public List<Integer> rightSideView(TreeNode root) {
+        Queue<TreeNode> queue = new LinkedList<>();
+        if (root != null) {
+            queue.add(root);
+        }
+        List<Integer> res = new LinkedList<>();
+
+        //层序遍历
+        while (!queue.isEmpty()) {
+            int size = queue.size();
+            for (int i = 0; i < size; i++) {
+                TreeNode node = queue.poll();
+                //判断下当前节点是否为这一层的最后一个节点，是的话就加入到res中
+                if (i == size - 1) {
+                    res.add(node.val);
+                }
+                if (node.left != null) {
+                    queue.add(node.left);
+                }
+                if (node.right != null) {
+                    queue.add(node.right);
+                }
+            }
+        }
+
+        return res;
+    }
+}
+```
