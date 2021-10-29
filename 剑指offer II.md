@@ -2087,3 +2087,164 @@ class Solution {
     }
 }
 ```
+
+
+
+## 树
+
+### [47. 二叉树剪枝](https://leetcode-cn.com/problems/pOCWxh/)
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    public TreeNode pruneTree(TreeNode root) {
+        if (root == null) {
+            return root;
+        }
+
+        //递归地对左右子树做处理
+        root.left = pruneTree(root.left);
+        root.right = pruneTree(root.right);
+        //若当前节点值为0且它的左右子数都被剪枝，那么它也要被剪枝
+        if (root.val == 0 && root.left == null && root.right == null) {
+            root = null;
+        }
+
+        return root;
+    }
+}
+```
+
+
+
+### [48. 序列化与反序列化二叉树](https://leetcode-cn.com/problems/h54YBf/)
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+public class Codec {
+
+    // Encodes a tree to a single string.
+    public String serialize(TreeNode root) {
+        if (root == null)   return "[]";
+        StringBuilder res = new StringBuilder("[");
+        //使用队列进行层序遍历
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.add(root);
+        while (!queue.isEmpty()){
+            TreeNode node = queue.poll();
+            //不要忘记在新添加到res中的数后面加","
+            if (node != null){
+                res.append(node.val + ",");
+                queue.add(node.left);
+                queue.add(node.right);
+            }else {
+                res.append("null,");
+            }
+        }
+        //删除最后一个逗号，并换成]
+        res.deleteCharAt(res.length() - 1);
+        res.append("]");
+        return res.toString();
+    }
+
+    // Decodes your encoded data to tree.
+    public TreeNode deserialize(String data) {
+        if (data.equals("[]"))  return null;
+        //忽略data中的"["和"]",然后以逗号分割成string数组，每个数组元素代表一个节点值
+        String[] vals = data.substring(1, data.length() - 1).split(",");
+        //把数组首元素作为根结点入队
+        TreeNode root = new TreeNode(Integer.parseInt(vals[0]));
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.add(root);
+        //i为访问vals的下标，由于root已经加到queue中，所以i从1开始
+        int i = 1;
+        while (!queue.isEmpty()){
+            TreeNode node = queue.poll();
+            //当节点值为null时，其实在二叉树中就不存在这个节点，也就不需要创建TreeNode了
+            //但是无论如何，由于vals[i]被访问过，所以i++无论怎样都要自增的
+            if (!vals[i].equals("null")){
+                node.left = new TreeNode(Integer.parseInt(vals[i]));
+                queue.add(node.left);
+            }
+            i++;
+            if (!vals[i].equals("null")){
+                node.right = new TreeNode(Integer.parseInt(vals[i]));
+                queue.add(node.right);
+            }
+            i++;
+        }
+        return root;
+    }
+}
+
+// Your Codec object will be instantiated and called as such:
+// Codec ser = new Codec();
+// Codec deser = new Codec();
+// TreeNode ans = deser.deserialize(ser.serialize(root));
+```
+
+
+### [49. 从根节点到叶节点的路径数字之和](https://leetcode-cn.com/problems/3Etpl5/)
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    public int sumNumbers(TreeNode root) {
+        return dfs(root, 0);
+    }
+
+    //深度优先搜索
+    private int dfs(TreeNode root, int preSum) {
+        if (root == null) {
+            return 0;
+        }
+
+        //从上至下进行递归
+        //先计算出树的上面的和，再通过乘10的方式累加上下面的节点值
+        int sum = 10 * preSum + root.val;
+        //是叶子结点，说明递归到头了，直接把从跟节点到当前节点的和返回
+        if (root.left == null && root.right == null) {
+            return sum;
+        } else {
+            //不是叶子结点，那么就递归地求左右子树的和
+            return dfs(root.left, sum) + dfs(root.right, sum);
+        }
+    }
+}
+```
