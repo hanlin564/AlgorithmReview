@@ -2248,3 +2248,145 @@ class Solution {
     }
 }
 ```
+
+
+### [50. 向下的路径节点之和](https://leetcode-cn.com/problems/6eUYwP/)
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    //求有多少条路径上的节点值的和为sum
+    public int pathSum(TreeNode root, int sum) {
+        //若树为null,返回0
+        if(root == null)    return 0;
+        //满足条件的路径总数=根节点就满足条件的路径数+左子树满足条件的路径数+右子树满足条件的路径数
+        int result = pathSumStartWithRoot(root, sum)+pathSum(root.left,sum)+pathSum(root.right,sum);
+        return result;
+    }
+
+    public int pathSumStartWithRoot(TreeNode root, int sum){
+        //如果节点为null,返回0
+        if(root == null)    return 0;
+        //默认路径和为0
+        int pathsum = 0;
+        //如果节点值就为sum,使路路径和递增
+        if(root.val == sum) pathsum++;
+        //当前节点为根的所有路径和=左子树的路径和+右子树的路径和+之前的路径和
+        //要记得左右子树上的sum要减去当前节点的值
+        pathsum += pathSumStartWithRoot(root.left, sum-root.val) + pathSumStartWithRoot(root.right, sum-root.val);
+        return pathsum;
+    }
+}
+```
+
+
+### [51. 节点之和最大的路径](https://leetcode-cn.com/problems/jC7MId/)
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    private int result = Integer.MIN_VALUE;
+
+    public int maxPathSum(TreeNode root) {
+        /**
+        对于任意一个节点, 如果最大和路径包含该节点, 那么只可能是两种情况:
+        1. 其左右子树中所构成的和路径值较大的那个加上该节点的值后向父节点回溯构成最大路径
+        2. 左右子树都在最大路径中, 加上该节点的值构成了最终的最大路径
+        **/
+        getMax(root);
+        return result;
+    }
+
+    //getMax递归本身算的是上述第一种情况的最大路径，ret算的是第二种情况的最大路径
+    //返回以node为根结点的左右子树所构成的和路径值较大的那个加上该节点的值
+    private int getMax(TreeNode root) {
+        if (root == null) {
+            return 0;
+        }
+        // 如果子树路径和为负则应当置0表示最大路径不包含子树
+        int left = Math.max(0, getMax(root.left));
+        int right = Math.max(0, getMax(root.right));
+        // 判断在该节点包含左右子树的路径和是否大于当前最大路径和
+        // 这里是计算左右子树路径和+根结点值，若大于则更新ret
+        result = Math.max(result, root.val + left + right);
+
+        return Math.max(left, right) + root.val;
+    }
+}
+```
+
+
+### [52. 展平二叉搜索树](https://leetcode-cn.com/problems/NYBBNL/)
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+
+    //cur指向已展开部分的最右侧的节点
+    private TreeNode cur;
+
+    public TreeNode increasingBST(TreeNode root) {
+        TreeNode dummy = new TreeNode();
+        cur = dummy;
+        inorder(root);
+        return dummy.right;
+    }
+
+    //中序遍历二叉搜索树，得到从小到大的序列
+    private void inorder(TreeNode node) {
+        if (node == null) {
+            return;
+        }
+
+        inorder(node.left);
+        //把当前节点接在cur的右子树，并更新cur的指向
+        cur.right = node;
+        node.left = null;
+        cur = node;
+
+        inorder(node.right);    
+    }
+}
+```
