@@ -2390,3 +2390,143 @@ class Solution {
     }
 }
 ```
+
+
+### [53. 二叉搜索树中的中序后继](https://leetcode-cn.com/problems/P5rCT8/)
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+class Solution {
+    //标记p节点是否被访问到
+    private boolean hasVisited;
+
+    public TreeNode inorderSuccessor(TreeNode root, TreeNode p) {
+        hasVisited = false;
+        return inorder(root, p);
+    }
+
+    //中序遍历二叉搜索树，序列从小到大
+    public TreeNode inorder(TreeNode node, TreeNode p) {
+        if (node == null) {
+            return null;
+        }
+        //若当前节点就是p，则把hasVisited置为true
+        if (node == p) {
+            hasVisited = true;
+        }
+        TreeNode left = inorder(node.left, p);
+        //用if第一次判断p已经被访问到且当前节点值大于p的节点值，说明当前节点就是p的中序后继
+        //把hasVisited置为true且返回当前节点作为答案
+        //之所以把hasVisited置为true，是因为后面的节点都不是直接后继了
+        if (hasVisited && node.val > p.val) {
+            hasVisited = false;
+            return node;
+        }
+        TreeNode right = inorder(node.right, p);
+        //p的中序后继在递归中作为结果返回，保存在left或right中
+        return left == null ? right : left;
+    }
+}
+```
+
+
+### [54. 所有大于等于节点的值之和](https://leetcode-cn.com/problems/w6cpku/)
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+class Solution {
+    //sum保存了当前遍历到的节点右子树(所有大于当前节点的节点)的值的和
+    int sum=0;
+
+    public TreeNode convertBST(TreeNode root) {
+        traver(root);
+        return root;
+    }
+
+    //通过反向中序遍历来使sum逐渐累加
+    //遍历是以"最右侧的叶子节点->根节点->左子树"的顺序进行的
+    //这样每个节点都可以使自己的值变为右子树值的和
+    public void traver(TreeNode node){
+        if(node==null)  return;
+        traver(node.right);
+        sum += node.val;
+        node.val=sum;
+        traver(node.left);
+    }
+}
+```
+
+
+### [55. 二叉搜索树迭代器](https://leetcode-cn.com/problems/kTOapQ/)
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class BSTIterator {
+    //cur指向当前节点，执行next方法时，会返回cur节点的中序后继
+    private TreeNode cur;
+    //stack用于中序遍历
+    private Stack<TreeNode> stack;
+
+    public BSTIterator(TreeNode root) {
+        cur = root;
+        stack = new Stack<>();
+    }
+    
+    //这题考的就是怎么不用递归去实现中序遍历
+    public int next() {
+        //把当前节点一直到最左侧的叶子结点都入栈，循环结束后cur指向null
+        while (cur != null) {
+            stack.push(cur);
+            cur = cur.left;
+        }
+        //cur指向刚出栈的节点，并把这个节点值返回
+        cur = stack.pop();
+        int ans = cur.val;
+        //cur指向cur的右子节点
+        //这样下一次执行next方法就是针对cur的右子树进行了（中序遍历）
+        cur = cur.right;
+        return ans;
+    }
+    
+    public boolean hasNext() {
+        return cur != null || !stack.isEmpty();
+    }
+}
+
+/**
+ * Your BSTIterator object will be instantiated and called as such:
+ * BSTIterator obj = new BSTIterator(root);
+ * int param_1 = obj.next();
+ * boolean param_2 = obj.hasNext();
+ */
+```
