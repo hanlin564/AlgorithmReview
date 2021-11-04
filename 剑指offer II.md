@@ -2530,3 +2530,134 @@ class BSTIterator {
  * boolean param_2 = obj.hasNext();
  */
 ```
+
+
+### [56. 二叉搜索树中两个节点之和](https://leetcode-cn.com/problems/opLdQZ/)
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    public boolean findTarget(TreeNode root, int k) {
+        List<Integer> nums = new ArrayList<>();
+        inorder(root, nums);
+        //通过二分查找寻找是否存在和为k的两个节点
+        int i = 0, j = nums.size() - 1;
+        while (i < j) {
+            int sum = nums.get(i) + nums.get(j);
+            if (sum == k) {
+                return true;
+            } else if (sum > k) {
+                j--;
+            } else {
+                i++;
+            }
+        }
+        return false;
+    }
+
+    //通过中序遍历得到二叉搜索树从小到大的顺序序列，并存放在nums中
+    private void inorder(TreeNode root, List<Integer> nums) {
+        if (root == null) {
+            return;
+        }
+        inorder(root.left, nums);
+        nums.add(root.val);
+        inorder(root.right, nums);
+    }
+}
+```
+
+
+### [57. 值和下标之差都在给定范围内](https://leetcode-cn.com/problems/7WqeDu/)
+
+```java
+class Solution {
+    public boolean containsNearbyAlmostDuplicate(int[] nums, int k, int t) {
+        int n = nums.length;
+        TreeSet<Long> treeSet = new TreeSet<>();
+        for (int i = 0; i < n; i++) {
+            //取出当前元素的值为u
+            Long u = nums[i] * 1L;
+            // 从 treeSet 中找到小于等于 u 的最大值（小于等于 u 的最接近 u 的数）
+            Long l = treeSet.floor(u);
+            // 从 treeSet 中找到大于等于 u 的最小值（大于等于 u 的最接近 u 的数）
+            Long r = treeSet.ceiling(u);
+
+            /**
+             * 只需判断l和r是否满足abs(nums[i] - nums[j])
+             * 若不满足说明滑动窗口内其它元素也一定不满足
+             */
+            if (l != null && u - l <= t) {
+                return true;
+            }
+            if (r != null && r - u <= t) {
+                return true;
+            }
+
+            /**
+             * 维护一个大小等于k的滑动窗口，滑动窗口中的数都要添加到treeSet中
+             * 这样做的好处就是，treeSet中取出的元素必然满足abs(i - j) <= k的条件，我们只需判断是否满足abs(nums[i] - nums[j])就好了
+             */
+            treeSet.add(u);
+            if (i >= k) {
+                treeSet.remove(nums[i - k] * 1L);
+            }
+        }
+        return false;
+    }
+}
+```
+
+
+### [58. 日程表](https://leetcode-cn.com/problems/fi9suh/)
+
+```java
+class MyCalendar {
+
+    TreeMap<Integer, Integer> treeMap;
+
+    public MyCalendar() {
+        treeMap = new TreeMap<>();
+    }
+    
+    public boolean book(int start, int end) {
+        //在treeMap中找到小于等于start的最近的日程
+        //若这个日程的end大于start，说明时间有冲突
+        Map.Entry<Integer, Integer> event = treeMap.floorEntry(start);
+        if (event != null && event.getValue() > start) {
+            return false;
+        }
+
+        //在treeMap中找到大于等于start的最近的日程
+        //若这个日程的start小于end，说明时间有冲突
+        event = treeMap.ceilingEntry(start);
+        if (event != null && event.getKey() < end) {
+            return false;
+        }
+
+        //把当前日程存入treeMap中并返回true
+        treeMap.put(start, end);
+        return true;
+    }
+}
+
+/**
+ * Your MyCalendar object will be instantiated and called as such:
+ * MyCalendar obj = new MyCalendar();
+ * boolean param_1 = obj.book(start,end);
+ */
+```
