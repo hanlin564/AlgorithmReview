@@ -2661,3 +2661,140 @@ class MyCalendar {
  * boolean param_1 = obj.book(start,end);
  */
 ```
+
+
+
+## 堆
+
+### [59. 数据流的第K大数值](https://leetcode-cn.com/problems/jBjn9C/)
+
+```java
+class KthLargest {
+    //优先队列，按照从大到小的顺序存储数据流中的数字
+    Queue<Integer> queue;
+    int k;
+
+    public KthLargest(int k, int[] nums) {
+        this.k = k;
+        queue = new PriorityQueue<>();
+        for (int num : nums) {
+            add(num);
+        }
+    }
+    
+    public int add(int val) {
+        //把val入队，优先队列会自动维护其中元素的顺序
+        queue.offer(val);
+        //如果队列中元素个数大于k，就一直出队到元素个数等于k为止
+        if (queue.size() > k) {
+            queue.poll();
+        }
+        //当队列中元素个数等于k时，最大的k-1个数都出队了，此时队头元素就是第k大个元素
+        return queue.peek();
+    }
+}
+
+/**
+ * Your KthLargest object will be instantiated and called as such:
+ * KthLargest obj = new KthLargest(k, nums);
+ * int param_1 = obj.add(val);
+ */
+```
+
+
+### [60. 出现频率最高的k个数字](https://leetcode-cn.com/problems/g5c51o/)
+
+```java
+class Solution {
+    public int[] topKFrequent(int[] nums, int k) {
+        //map:以"数---出现次数"的形式保存每个数在数组中的出现次数
+        Map<Integer, Integer> frequencyForNum = new HashMap<>();
+        for (int num : nums) {
+            frequencyForNum.put(num, frequencyForNum.getOrDefault(num, 0) + 1);
+        }
+        //初始化一些桶(ArrayList对象数组)
+        //每个桶都是ArrayList
+        //buckets数组的索引代表了出现次数
+        //索引指向的ArrayList里存放的是出现次数为该索引的所有数
+        List<Integer>[] buckets = new ArrayList[nums.length + 1];
+        //扫描map
+        //最后面的桶存放的是出现频率最高的数
+        //最前的桶存放的是出现频率最低的数
+        for (int key : frequencyForNum.keySet()) {
+            //frequency用于存储每个数的出现次数
+            int frequency = frequencyForNum.get(key);
+            //若出现频率对应的ArrayList为null
+            //则需要把它初始化
+            if (buckets[frequency] == null) {
+                buckets[frequency] = new ArrayList<>();
+            }
+            //把数加入到存放到对应出现频率的ArrayList中
+            buckets[frequency].add(key);
+        }
+        List<Integer> topK = new ArrayList<>();
+        //从后往前遍历桶,因为最后面的桶存放的是出现频率最高的数
+        //注意条件topK.size() < k,因为topK存储前k个高频元素,它的大小应该小于k
+        for (int i = buckets.length - 1; i >= 0 && topK.size() < k; i--) {
+            //若当前桶为null,说明没有数频率为i,直接进行下一轮循环
+            if (buckets[i] == null) {
+                continue;
+            }
+            //出现频率为i的数可能有多个
+            //当topK中还有剩余位置k - topK.size()可以放下所有出现频率为i的数时
+            //就把出现频率为i的数都加入topK
+            if (buckets[i].size() <= (k - topK.size())) {
+                topK.addAll(buckets[i]);
+            } else {
+                //当出现频率为i的数太多,只有一部分能放入topK中时
+                //便放入k - topK.size()个(正好等于topK的剩余空间)
+                topK.addAll(buckets[i].subList(0, k - topK.size()));
+            }
+        }
+        //把topK元素放到数组中并返回
+        int[] res = new int[k];
+        for (int i = 0; i < k; i++) {
+            res[i] = topK.get(i);
+        }
+        return res;
+    }
+}
+```
+
+
+### [61. 和最小的k个数对](https://leetcode-cn.com/problems/qn8gGX/)
+
+```java
+class Solution {
+    public List<List<Integer>> kSmallestPairs(int[] nums1, int[] nums2, int k) {
+        //这个优先队列是按照数对和的大小进行排序的，小的数对和排在前面
+        Queue<int[]> queue = new PriorityQueue<>((a, b) -> nums1[a[0]] + nums2[a[1]] - nums1[b[0]] - nums2[b[1]]);
+        //set用于去除重复的数对和
+        Set<String> set = new HashSet<>();
+        queue.offer(new int[]{0, 0});
+        //ans保存最终返回的结果
+        List<List<Integer>> ans = new ArrayList<>();
+        //找前k小的数对和，且两个数组都是经过排序的，所以循环最多进行k次
+        while (k-- > 0 && queue.size() > 0) {
+            //从优先队列中取出最小和的数对放到ans中
+            int[] pair = queue.poll();
+            ans.add(Arrays.asList(nums1[pair[0]], nums2[pair[1]]));
+            /**
+             * 因为两个数组都已排序，所以下一个最小数对要么是[nums1中的下标后移1位, nums2中下标不变]，要么是[nums1中下标不变, nums2中的下标后移1位]
+             */
+            if (pair[0] + 1 < nums1.length) {
+                String key = String.valueOf(pair[0] + 1) + "_" + String.valueOf(pair[1]);
+                if (set.add(key)) {
+                    queue.offer(new int[]{pair[0] + 1, pair[1]});
+                }
+            }
+            if (pair[1] + 1 < nums2.length) {
+                String key = String.valueOf(pair[0]) + "_" + String.valueOf(pair[1] + 1);
+                if (set.add(key)) {
+                    queue.offer(new int[]{pair[0], pair[1] + 1});
+                }
+            }
+        }
+        return ans;
+    }
+}
+```
