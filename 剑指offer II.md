@@ -2798,3 +2798,216 @@ class Solution {
     }
 }
 ```
+
+
+## 前缀树
+
+### [62. 实现前缀树](https://leetcode-cn.com/problems/QC3q1f/)
+
+```java
+class Trie {
+    //每个节点包含
+    //指向子节点的指针数组
+    private Trie[] childs;
+    //isEnd表示该节点是否为某个字符串的结尾
+    private boolean isEnd;
+
+    /** Initialize your data structure here. */
+    public Trie() {
+        childs = new Trie[26];
+        isEnd = false;
+    }
+    
+    /** Inserts a word into the trie. */
+    public void insert(String word) {
+        Trie node = this;
+        //遍历字符串
+        for (int i = 0; i < word.length(); i++) {
+            char ch = word.charAt(i);
+            int index = ch - 'a';//获取当前字符对应的小写字母下标
+            //若对应的小写字母下标为null，说明子节点不存在，new一个子节点
+            if (node.childs[index] == null) {
+                node.childs[index] = new Trie();
+            }
+            //node指向子节点
+            node = node.childs[index];
+        }
+        //遍历完成后，把最后一个节点isEnd置为true
+        node.isEnd = true;
+    }
+    
+    /** Returns if the word is in the trie. */
+    public boolean search(String word) {
+        //若word存在于trie树中且最后一个字符对应的节点isEnd为true，就返回true
+        Trie node = searchPrefix(word);
+        return node != null && node.isEnd;
+    }
+    
+    /** Returns if there is any word in the trie that starts with the given prefix. */
+    public boolean startsWith(String prefix) {
+        return searchPrefix(prefix) != null;
+    }
+
+    //寻找前缀prefix
+    //若prefix不存在于trie树中则返回null
+    //若存在则返回prefix最后一个字符对应的节点
+    private Trie searchPrefix(String prefix) {
+        Trie node = this;
+        for (int i = 0; i < prefix.length(); i++) {
+            char ch = prefix.charAt(i);
+            int index = ch - 'a';
+            //这里代码和插入基本一样，区别是这里判断子节点为null就返回null
+            if (node.childs[index] == null) {
+                return null;
+            }
+            node = node.childs[index];
+        }
+        return node;
+    }
+}
+
+/**
+ * Your Trie object will be instantiated and called as such:
+ * Trie obj = new Trie();
+ * obj.insert(word);
+ * boolean param_2 = obj.search(word);
+ * boolean param_3 = obj.startsWith(prefix);
+ */
+```
+
+
+### [63. 替换单词](https://leetcode-cn.com/problems/UhWRSj/)
+
+自己写了半天老是错的，还不如直接抄[大佬题解](https://leetcode-cn.com/problems/UhWRSj/solution/zui-yi-yu-li-jie-de-javajie-fa-shi-jian-vcx4e/)
+
+```java
+class Solution {
+
+    //前缀树数据结构是一个字符多叉树，用一个数组来保存其子节点， isValid用来标记截止到该节点是否为一个完整的单词
+    class TrieNode{
+        TrieNode[] kids;
+        boolean isValid;
+        public TrieNode(){
+            kids = new TrieNode[26];
+        }
+    }
+
+    TrieNode root = new TrieNode();
+
+    public String replaceWords(List<String> dictionary, String sentence) {
+        String[] words = new String[dictionary.size()];
+        for(int i = 0; i < words.length; ++i) words[i] = dictionary.get(i);
+        //建树过程
+        for(String word : words){
+            insert(root, word);
+        }
+        String[] strs = sentence.split(" ");
+        for(int i = 0; i < strs.length; ++i){
+            //如果可以在树中找到对应单词的前缀，那么将这个单词替换为它的前缀
+            if(search(root, strs[i])){
+                strs[i] = replace(strs[i], root);
+            }
+        }
+        //用StringBuilder来把字符串数组还原成原字符串句子的转换目标字符串
+        StringBuilder sb = new StringBuilder();
+        for(String s : strs){
+            sb.append(s).append(" ");
+        }
+        sb.deleteCharAt(sb.length()-1);
+        return sb.toString();
+    }
+
+    //建前缀树模版
+    public void insert(TrieNode root, String s){
+        TrieNode node = root;
+        for(char ch : s.toCharArray()){
+            if(node.kids[ch - 'a'] == null) node.kids[ch - 'a'] = new TrieNode();
+            node = node.kids[ch - 'a'];
+        }
+        node.isValid = true;
+    }
+
+    //查询是否存在传入的字符串的前缀
+    public boolean search(TrieNode root, String s){
+        TrieNode node = root;
+        for(char ch : s.toCharArray()){
+            if(node.isValid == true) break;
+            if(node.kids[ch - 'a'] == null) return false;
+            node = node.kids[ch - 'a'];
+        }
+        return true;
+    }
+
+    //将传入的字符串替换为它在前缀树中的前缀字符串
+    public String replace(String s, TrieNode root){
+        TrieNode node = root;
+        StringBuilder sb = new StringBuilder();
+        for(char ch : s.toCharArray()){
+            if(node.isValid || node.kids[ch - 'a'] == null) break;
+            node = node.kids[ch - 'a'];
+            sb.append(ch);
+        }
+        return sb.toString();
+    }
+}
+```
+
+
+## [64. 神奇的字典](https://leetcode-cn.com/problems/US1pGT/)
+
+```java
+class MagicDictionary {
+
+    //单词长度 -> 存储同样长度单词的list
+    Map<Integer, List<String>> map;
+
+    /** Initialize your data structure here. */
+    public MagicDictionary() {
+        map = new HashMap<>();
+    }
+    
+    public void buildDict(String[] dictionary) {
+        //把dictionary中的单词都存放在map中，若没有对应的数组就先创建
+        for (String word : dictionary) {
+            int len = word.length();
+            if (!map.containsKey(len)) {
+                map.put(len, new ArrayList<>());
+            }
+            map.get(len).add(word);
+        }
+    }
+    
+    public boolean search(String searchWord) {
+        int len = searchWord.length();
+        //如果没有单词与searchWord长度相同，就返回false
+        if (!map.containsKey(len)) {
+            return false;
+        }
+        for (String word : map.get(len)) {
+            //count记录当前word和searchWord字符不同的个数
+            int count = 0;
+            for (int i = 0; i < len; i++) {
+                if (word.charAt(i) != searchWord.charAt(i)) {
+                    count++;
+                }
+                if (count > 1) {
+                    break;
+                }
+            }
+            //若存在单词与searchWord之间只相差一个字符，返回true
+            if (count == 1) {
+                return true;
+            }
+        }
+        //默认情况下返回false
+        return false;
+    }
+}
+
+/**
+ * Your MagicDictionary object will be instantiated and called as such:
+ * MagicDictionary obj = new MagicDictionary();
+ * obj.buildDict(dictionary);
+ * boolean param_2 = obj.search(searchWord);
+ */
+```
