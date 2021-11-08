@@ -3011,3 +3011,230 @@ class MagicDictionary {
  * boolean param_2 = obj.search(searchWord);
  */
 ```
+
+
+### [65. 最短的单词编码](https://leetcode-cn.com/problems/iSwD2y/)
+
+```java
+class Solution {
+    public int minimumLengthEncoding(String[] words) {
+        int len = 0;
+        Trie trie = new Trie();
+        /**
+         * 把单词按照长度从大到小进行排序
+         * 如果先把短的单词（长单词的前缀）插入Trie，长的单词后插入，就会增加助记字符串的长度了
+         * 所以必须先插入长的单词，再插入短的前缀，这样能使得助记字符串尽可能短
+         */
+        Arrays.sort(words, (s1, s2) -> s2.length() - s1.length());
+        for (String word : words) {
+            len += trie.insert(word);
+        }
+        return len;
+    }
+
+    class Trie {
+        TrieNode root;
+
+        public Trie() {
+            root = new TrieNode();
+        }
+
+        public int insert(String word) {
+            TrieNode cur = root;
+            boolean isNew = false;
+            /**
+             * 倒序往Trie中插入单词
+             * 若某个单词是已经插入的单词的后缀，倒序插入就为前缀了
+             * 这就是用Trie树的原因
+             */
+            for (int i = word.length() - 1; i >= 0; i--) {
+                int c = word.charAt(i) - 'a';
+                if (cur.child[c] == null) {
+                    isNew = true;
+                    cur.child[c] = new TrieNode();
+                }
+                cur = cur.child[c];
+            }
+            //如果是新单词，就返回word.length() + 1
+            //1指的是"#"符号的长度
+            return isNew ? word.length() + 1 : 0;
+        }
+    }
+
+    class TrieNode {
+        char val;
+        TrieNode[] child = new TrieNode[26];
+
+        public TrieNode() {}
+    }
+}
+```
+
+
+### [66. 单词之和](https://leetcode-cn.com/problems/z1R5dt/)
+
+```java
+class MapSum {
+
+    class Trie {
+        int val;
+        Trie[] child = new Trie[26];
+    }
+
+    Trie root;
+
+    /** Initialize your data structure here. */
+    public MapSum() {
+        root = new Trie();
+    }
+    
+    public void insert(String key, int val) {
+        Trie node = root;
+        for (int i = 0; i < key.length(); i++) {
+            int index = key.charAt(i) - 'a';
+            if (node.child[index] == null) {
+                node.child[index] = new Trie();
+            }
+            node = node.child[index];
+        }
+        /**
+         * 插入新的key或是覆盖原来的key，都要更新val
+         */
+        node.val = val;
+    }
+    
+    public int sum(String prefix) {
+        int ans = 0;
+        Trie node = root;
+        for (int i = 0; i < prefix.length(); i++) {
+            int index = prefix.charAt(i) - 'a';
+            if (node.child[index] == null) {
+                node.child[index] = new Trie();
+            }
+            node = node.child[index];
+        }
+        /**
+         * 搜索到前缀的最后一个字母所在的node
+         * 从这个node开始求所有以prefix为前缀的key的val值的和
+         */
+        return dfs(node);
+    }
+
+    //递归，从node开始往下求所有val值的和
+    private int dfs(Trie node) {
+        if (node == null) {
+            return 0;
+        }
+        int ans = 0;
+        for (int i = 0; i < 26; i++) {
+            if (node.child[i] != null) {
+                //递归地求每个子树的val值的和
+                ans += dfs(node.child[i]);
+            }
+        }
+        return ans + node.val;
+    }
+}
+
+/**
+ * Your MapSum object will be instantiated and called as such:
+ * MapSum obj = new MapSum();
+ * obj.insert(key,val);
+ * int param_2 = obj.sum(prefix);
+ */
+```
+
+
+### [67. 最大的异或](https://leetcode-cn.com/problems/ms70jA/)
+
+```java
+class Solution {
+    Trie root = new Trie();
+    static final int HIGH_BIT = 30;
+
+    public int findMaximumXOR(int[] nums) {
+        int n = nums.length;
+        int x = 0;
+        for (int i = 1; i < n; i++) {
+            add(nums[i - 1]);
+            x = Math.max(x, check(nums[i]));
+        }
+        return x;
+    }
+
+    /**
+     * 把num以二进制位的形式插入Trie树中
+     * @param num
+     */
+    public void add(int num) {
+        Trie cur = root;
+        for (int k = HIGH_BIT; k >= 0; k--) {
+            int bit = (num >> k) & 1;
+            if (bit == 0) {
+                if (cur.left == null) {
+                    cur.left = new Trie();
+                }
+                cur = cur.left;
+            } else {
+                if (cur.right == null) {
+                    cur.right = new Trie();
+                }
+                cur = cur.right;
+            }
+        }
+    }
+
+    /**
+     * 计算num和此前插入Trie树的数字的异或运算的最大结果
+     * 思想：使尽可能多的位为1
+     * @param num
+     * @return
+     */
+    public int check(int num) {
+        Trie cur = root;
+        int x = 0;
+        for (int k = HIGH_BIT; k >= 0; k--) {
+            int bit = (num >> k) & 1;
+            if (bit == 0) {
+                /**
+                 * 如果num当前位为0，需要与1进行异或运算以得到1
+                 * 所以优先看右子树，若为null则只能看左子树了（当前位为0）
+                 */
+                if (cur.right != null) {
+                    cur = cur.right;
+                    x = x * 2 + 1;
+                } else {
+                    cur = cur.left;
+                    x = x * 2;
+                }
+            } else {
+                /**
+                 * 如果num当前位为1，需要与0进行异或运算以得到1
+                 * 所以优先看左子树，若为null则只能看右子树了（当前位为0）
+                 */
+                if (cur.left != null) {
+                    cur = cur.left;
+                    x = x * 2 + 1;
+                } else {
+                    cur = cur.right;
+                    x = x * 2;
+                }
+            }
+        }
+        return x;
+    }
+
+    /**
+     * 这个前缀树比较特殊，只有左右两个节点，分别表示0或1
+     * 从根节点到下面的节点表示了nums中某个数字的二进制位的情况（从一个整数最左侧的位开始）
+     */
+    class Trie {
+        /**
+         * 左子树指向表示0的子节点
+         * 右子树指向表示1的子节点
+         */
+        Trie left = null;
+        Trie right = null;
+    }
+}
+```
