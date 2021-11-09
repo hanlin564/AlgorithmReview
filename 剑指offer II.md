@@ -3238,3 +3238,81 @@ class Solution {
     }
 }
 ```
+
+
+## 二分查找
+
+### [68. 查找插入位置](https://leetcode-cn.com/problems/N6YdxV/)
+
+```java
+class Solution {
+    public int searchInsert(int[] nums, int target) {
+        int n = nums.length;
+        int left = 0, right = n - 1, ans = n;
+        while (left <= right) {
+            int mid = left + ((right - left) >> 1);
+            if (target <= nums[mid]) {
+                ans = mid;
+                right = mid - 1;
+            } else {
+                left = mid + 1;
+            }
+        }
+        return ans;
+    }
+}
+```
+
+
+### [69. 山峰数组的顶部](https://leetcode-cn.com/problems/B1IidL/)
+
+```java
+class Solution {
+    public int peakIndexInMountainArray(int[] arr) {
+        int n = arr.length;
+        int left = 1, right = n - 2, ans = 0;
+        while (left <= right) {
+            int mid = left + ((right - left) >> 1);
+            if (arr[mid] > arr[mid + 1]) {
+                ans = mid;
+                right = mid - 1;
+            } else {
+                left = mid + 1;
+            }
+        }
+        return ans;
+    }
+}
+```
+
+
+### [70. 排序数组中只出现一次的数字](https://leetcode-cn.com/problems/skFtm2/)
+
+```java
+class Solution {
+    public int singleNonDuplicate(int[] nums) {
+        //初始化首尾指针
+        int low=0, high=nums.length-1;
+        //因为最后是把区间缩小到只包含单一元素(一个元素),并返回这个元素
+        //low最终是等于high的
+        //所以循环终止条件不是<=
+        while (low<high) {
+            int mid = low + (high-low)/2;
+            //这个操作保证mid为偶数索引
+            //同时也保证了mid之前的元素有偶数个
+            if (mid%2==1) {
+                mid--;
+            }
+            //若相同元素在mid右侧,说明单一元素一定在mid后面
+            if (nums[mid]==nums[mid+1]) {
+                low = mid+2;
+            }else if (nums[mid]!=nums[mid+1]) {
+                //若相同元素不在mid右侧,则单一元素要么是mid要么是mid之前的元素
+                high = mid;
+            }
+        }
+        return nums[low];
+        //思路:数组被num[mid],num[mid+1]分为两部分:单一元素一定在奇数的那一部分,因为没有元素与它组成一队
+    }
+}
+```
