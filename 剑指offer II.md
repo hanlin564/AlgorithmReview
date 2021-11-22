@@ -3323,23 +3323,31 @@ class Solution {
 
 ```java
 class Solution {
+    //pre数组存储w数组中每个元素的前缀和
     int[] pre;
+    //total存储w数组的总和
     int total;
 
     public Solution(int[] w) {
         pre = new int[w.length];
         pre[0] = w[0];
+        //计算w的前缀和数组
         for (int i = 1; i < w.length; i++) {
             pre[i] = pre[i - 1] + w[i];
         }
+        //计算w数组中全部元素的和
         total = Arrays.stream(w).sum();
     }
     
+    //随机数 * 总和 = 数随机落在前缀和数组中哪个数上
+    //由于pre和w数组的下标是一一对应的
+    //所以在pre中二分查找x得到的下标就是按权重生成随机数
     public int pickIndex() {
         int x = (int) (Math.random() * total) + 1;
         return binarySearch(x);
     }
 
+    //在pre数组中寻找值x所对应的下标
     private int binarySearch(int x) {
         int low = 0, high = pre.length - 1;
         while (low < high) {
