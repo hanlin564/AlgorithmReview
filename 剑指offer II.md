@@ -3369,3 +3369,80 @@ class Solution {
  */
 ```
 
+
+
+### [72. 求平方根](https://leetcode-cn.com/problems/jJ0w9p/)
+
+```java
+class Solution {
+    public int mySqrt(int x) {
+        if (x<=1) {
+            return x;
+        }
+        int l = 1, r = x;
+        //结束循环的情况:l+1==r
+        while (l<=r) {
+            int mid = l + (r-l)/2;
+            int sqrt = x / mid;
+            //当sqrt==mid时,mid*mid==x,返回mid作为答案(结果是整数)
+            if (sqrt==mid) {
+                return mid;
+            }else if (mid > sqrt) {
+                //此时mid比平方根大
+                r = mid - 1;
+            }else if(mid < sqrt){
+                //此时mid比平方根小
+                l = mid + 1;
+            }
+        }
+        //循环结束时r==l+1
+        //结果是小数,此时答案在l和r中间,r小,根据题目要求返回r
+        return r;
+    }
+}
+```
+
+
+
+### [73. 狒狒吃香蕉](https://leetcode-cn.com/problems/nZZqjQ/)
+
+```java
+class Solution {
+    int[] piles;
+
+    public int minEatingSpeed(int[] piles, int h) {
+        this.piles = piles;
+        // 最简单的方式就是从1开始，2、3、4...这样去假设吃香蕉的速度，然后一个个去试
+        // 所以可以用二分查找来优化
+        int left = 1, right = 1000000000;
+        while (left < right) {
+            int k = left + (right - left) / 2;
+            // 若狒狒能以k的速度在h小时内吃完香蕉，就保留左区间
+            // 因为狒狒喜欢慢慢吃
+            // 否则说明速度不够，保留右区间
+            if (eat(k) <= h) {
+                right = k;
+            } else {
+                left = k + 1;
+            }
+        }
+        return left;
+    }
+
+    /**
+    输入当前吃香蕉的速度，返回狒狒吃完全部香蕉所需的时间
+     */
+    private int eat(int speed) {
+        int time = 0;
+        for (int pile : piles) {
+            if (pile % speed == 0) {
+                time += pile / speed;
+            } else {
+                time += pile / speed + 1;
+            }
+        }
+        return time;
+    }
+}
+```
+
