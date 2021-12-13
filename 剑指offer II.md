@@ -3446,3 +3446,37 @@ class Solution {
 }
 ```
 
+
+
+## 排序
+
+### [74. 合并区间](https://leetcode-cn.com/problems/SsGoHC/)
+
+```java
+class Solution {
+    public int[][] merge(int[][] intervals) {
+        //先对区间进行排序，区间首元素小的排在前
+        Arrays.sort(intervals, (a, b) -> {return a[0] - b[0];});
+        //新建一个res数组用于存储合并之后的区间。行数为intervals.length但一般不会用到这么多行，之后会把不用的行给略去
+        int[][] res = new int[intervals.length][2];
+        //index：用于控制往res中添加新的合并区间的下标，初始值为-1，代表此时res为空
+        int index = -1;
+        //遍历intervals
+        for (int[] interval : intervals) {
+            //往res添加新的合并区间有两种情况：
+            //1：res为空，这时当然要把第一个区间给添加进去来
+            //2：当前区间的首元素interval[0]大于上一个区间的末元素res[index][1]，这样两区间合并不了，需要把当前区间作为新区间添加
+            if (index == -1 || interval[0] > res[index][1]){
+                res[++index] = interval;//记得先对index自增再添加
+            }else {
+                //合并区间，就是把当前res中最后一个区间的末元素进行更新
+                //只有当前区间interval[1]大于res最后一个区间的末元素时才进行更新
+                res[index][1] = Math.max(res[index][1], interval[1]);
+            }
+        }
+        //res中有效的区间个数小于等于intervals.length，这时需要用copyOf来略去无效的行数
+        return Arrays.copyOf(res, index + 1);
+    }
+}
+```
+
