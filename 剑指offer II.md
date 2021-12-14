@@ -3480,3 +3480,49 @@ class Solution {
 }
 ```
 
+
+
+### [75. 数组相对顺序](https://leetcode-cn.com/problems/0H97ZC/)
+
+```java
+class Solution {
+    public int[] relativeSortArray(int[] arr1, int[] arr2) {
+        // 找到arr1中的最大值并保存到top中
+        // 创建freq数组，数组长度为top+1（arr1的元素一定在[0,top]之间）
+        int top = 0;
+        for (int num : arr1) {
+            top = Math.max(top, num);
+        }
+        int[] freq = new int[top + 1];
+
+        // 在freq中记录arr1中每个数的出现次数
+        for (int num : arr1) {
+            freq[num]++;
+        }
+
+        int[] ans = new int[arr1.length];
+
+        // 按顺序遍历arr2，若当前遍历到的数字num在arr1中出现过，那么freq[num]必定大于0
+        // 往ans数组的末尾追加freq[num]个num，然后把freq[num]置为0
+        int index = 0;
+        for (int num : arr2) {
+            for (int i = 0; i < freq[num]; i++) {
+                ans[index++] = num;
+            }
+            freq[num] = 0;
+        }
+
+        // 如果freq中还有不为0的freq[i]，说明这些不为0的i一定是在arr1中出现的但不存在于arr2中的数
+        // 把这些数添加到ans的末尾
+        // 因为i是从小到大遍历的，所以它们添加到ans中的顺序一定是升序的
+        for (int i = 0; i <= top; i++) {
+            for (int j = 0; j < freq[i]; j++) {
+                ans[index++] = i;
+            }
+        }
+
+        return ans;
+    }
+}
+```
+
