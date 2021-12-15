@@ -3526,3 +3526,183 @@ class Solution {
 }
 ```
 
+
+
+### [76. 数组中的第 k 大的数字](https://leetcode-cn.com/problems/xx4gT2/)
+
+```java
+class Solution {
+    Random random = new Random();
+
+    public int findKthLargest(int[] nums, int k) {
+        //快排之后数组为升序
+        //第k大的元素在排序后的数组中下标就为nums.length - k
+        return quickSelect(nums, 0, nums.length - 1, nums.length - k);
+    }
+
+    private int quickSelect(int[] nums, int left, int right, int index) {
+        //q存储分解之后中间元素的下标
+        int q = randomPartition(nums, left, right);
+        //若q等于index就返回nums[q]
+        if (q == index) {
+            return nums[q];
+        } else {
+            //否则判断q是否小于index
+            //若小于,则在q的右区间递归寻找等于index的下标
+            //若大于,则在q的左区间递归寻找等于index的下标
+            return q < index ? quickSelect(nums, q + 1, right, index) : quickSelect(nums, left, q - 1, index);
+        }
+    }
+
+    private int randomPartition(int[] nums, int left, int right) {
+        int i = random.nextInt(right - left + 1) + left;
+        swap(nums, i, right);
+        return partition(nums, left, right);
+    }
+
+    private int partition(int[] nums, int left, int right) {
+        //最右侧的元素就是把数组nums分为两部分的元素
+        //令x为这个元素
+        int x = nums[right], i = left - 1;//i指向区间左侧前一个位置
+        for (int j = left; j < right; j++) {//扫描left和right之间区间
+            //若当前元素小于x,那么把当前元素放在nums[r]的左侧
+            if (nums[j] <= x) {
+                //逐一放入
+                //第一个小于x的元素放在区间第一位
+                //第二个小于x的元素放在区间第二位...
+                swap(nums, ++i, j);
+            }
+        }
+        //循环结束后nums[left]~nums[i]的所有元素都是小于等于nums[right]的
+        //nums[i+1]]~nums[right-1]的所有元素都是大于等于nums[right]的
+        //把i+1元素与nums[right]交换位置
+        swap(nums, i + 1, right);
+        return i + 1;
+    }
+
+    private void swap(int[] nums, int i, int j) {
+        int tmp = nums[i];
+        nums[i] = nums[j];
+        nums[j] = tmp;
+    }
+}
+```
+
+
+
+### [77. 链表排序](https://leetcode-cn.com/problems/7WHec2/)
+
+```java
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode() {}
+ *     ListNode(int val) { this.val = val; }
+ *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+ * }
+ */
+class Solution {
+    public ListNode sortList(ListNode head) {
+        if (head == null || head.next == null) {
+            return head;
+        }
+
+        //找链表中点，并断开链表的前半段和后半段
+        ListNode mid = getMidNode(head);
+        ListNode head2 = mid.next;
+        mid.next = null;
+
+        //对链表前后两半进行归并排序
+        ListNode left = sortList(head);
+        ListNode right = sortList(head2);
+        //new一个虚节点方便操作
+        ListNode dummy = new ListNode();
+        //tail指向虚节点为头的链表的末尾
+        ListNode tail = dummy;
+
+        while (left != null && right != null) {
+            //把两段链表的头节点进行比较，小的就接到tail的后面
+            if (left.val < right.val) {
+                tail.next = left;
+                left = left.next;
+            } else {
+                tail.next = right;
+                right = right.next;
+            }
+            //更新tail的指向，向后移动一位
+            tail = tail.next;
+        }
+        //left或right的其中一个为空了，循环退出。此时把另一个剩下的链表全部接到tail后面就行了
+        tail.next = (left == null ? right : left);
+        //返回虚节点后的链表作为答案
+        return dummy.next;
+    }
+
+    //快慢指针找链表的中点，若是奇数个节点，则返回中点左边那个节点
+    private ListNode getMidNode(ListNode head) {
+        if (head == null || head.next == null) {
+            return head;
+        }
+        ListNode slow = head, fast = head.next;
+        while (fast != null && fast.next != null) {
+            fast = fast.next.next;
+            slow = slow.next;
+        }
+        return slow;
+    }
+}
+```
+
+
+
+### [78. 合并排序链表](https://leetcode-cn.com/problems/vvXgSW/)
+
+```java
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode() {}
+ *     ListNode(int val) { this.val = val; }
+ *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+ * }
+ */
+class Solution {
+    public ListNode mergeKLists(ListNode[] lists) {
+        if (lists == null || lists.length == 0) return null;
+
+        //用优先队列来存放还没有被合并的链表的头节点，升序排列
+        //优先队列会动态维护顺序，无论如何队首元素都是最小的
+        PriorityQueue<ListNode> queue = new PriorityQueue<ListNode>(lists.length, new Comparator<ListNode>() {
+            @Override
+            public int compare(ListNode o1, ListNode o2) {
+                if (o1.val < o2.val)    return -1;
+                else if (o1.val == o2.val)   return 0;
+                else    return 1;
+            }
+        });
+
+        //创建一个head节点，作为最终答案的链表的头节点，head本身无意义只是方便操作
+        ListNode head = new ListNode(0);
+        //tail指针一开始指向链表头
+        ListNode tail = head;
+        //遍历lists中的所有链表头节点，把它们都加入到优先队列中
+        for (ListNode node : lists) {
+            if (node != null)   queue.add(node);
+        }
+        while (!queue.isEmpty()){
+            //把优先队列的队首节点出队加入到答案链表的最后
+            tail.next = queue.poll();
+            tail = tail.next;
+            //注意：虽然队首节点加入到了答案链表最后，但是这个队首节点与它原来的链表还是通过指针连在一起的
+            //如果原链表还有元素，那这个元素就成了原链表新的头节点，也要加入优先队列
+            if (tail.next != null) queue.add(tail.next);
+        }
+        return head.next;
+    }
+}
+```
+
