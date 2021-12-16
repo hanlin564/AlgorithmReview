@@ -3706,3 +3706,40 @@ class Solution {
 }
 ```
 
+
+
+## 回溯法
+
+### [79. 所有子集](https://leetcode-cn.com/problems/TVdhkn/)
+
+```java
+class Solution {
+    public List<List<Integer>> subsets(int[] nums) {
+        List<List<Integer>> subsets = new ArrayList<>();
+        List<Integer> temp = new ArrayList<>();
+        //这里的循环是考虑到子集大小从0到nums.length的不同情况
+        for (int size = 0; size <= nums.length; size++){
+            backtracking(0, temp, subsets, size, nums);
+        }
+        return subsets;
+    }
+
+    private void backtracking(int start, List<Integer> temp, List<List<Integer>> subsets, 
+                              final int size, final int[] nums){
+        if(temp.size() == size){
+            subsets.add(new ArrayList<>(temp));
+            return;
+        }
+        for (int i = start; i < nums.length; i++){
+            temp.add(nums[i]);
+            //dfs
+            //需要注意i+1，因为组合是从左往右找的
+            backtracking(i + 1, temp, subsets, size, nums);
+            //回溯
+            temp.remove(temp.size() - 1);
+        }
+    }
+}
+```
+
+
