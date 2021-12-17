@@ -3743,3 +3743,72 @@ class Solution {
 ```
 
 
+
+### [80. 含有 k 个元素的组合](https://leetcode-cn.com/problems/uUsW3B/)
+
+```java
+class Solution {
+    public List<List<Integer>> combine(int n, int k) {
+        List<List<Integer>> combinations = new ArrayList<>();
+        List<Integer> combineList = new ArrayList<>();
+        backtracking(combineList, combinations, 1, k, n);
+        return combinations;
+    }
+
+    private void backtracking(List<Integer> combineList, List<List<Integer>> combinations, 
+                              int start, int k, final int n){
+        if (k == 0) {
+            combinations.add(new ArrayList<>(combineList));
+            return;
+        }
+        //如果 n = 7, k = 4，从 5开始搜索就已经没有意义了
+        //这是因为：即使把 5选上，后面的数只有 6 和 7，一共就 3个候选数，凑不出 4个数的组合。
+        //因此，搜索起点有上界
+        //可归纳出上界<=n-k+1
+        for (int i = start; i <= n - k + 1; i++) {
+            combineList.add(i);
+            //dfs，注意i+1,k-1
+            backtracking(combineList, combinations, i + 1, k - 1, n);
+            //回溯
+            combineList.remove(combineList.size() - 1);
+        }
+    }
+}
+```
+
+
+
+### [81. 允许重复选择元素的组合](https://leetcode-cn.com/problems/Ygoe9J/)
+
+```java
+class Solution {
+    public List<List<Integer>> combinationSum(int[] candidates, int target) {
+        List<List<Integer>> combinations = new ArrayList<>();
+        backtracking(new ArrayList<>(), combinations, 0, target, candidates);
+        return combinations;
+    }
+
+    //start：从数组中下标为start开始，对start右侧的所有数字尝试进行dfs
+    //target：需要凑出的和。随着dfs的深入会变小直至为0（凑成功了）
+    private void backtracking(List<Integer> temp, List<List<Integer>> combinations, 
+                            int start, int target, final int[] candidates){
+        //如果target等于0说明已经凑出，把当前组合加入到答案中并退出方法
+        if(target == 0){
+            combinations.add(new ArrayList<>(temp));
+            return;
+        }
+        //对start后面的数挨个进行dfs
+        for (int i = start; i < candidates.length; i++) {
+            //把一个数加入到组合中的条件是：加入这个数后小于等于target（不会爆）
+            if (candidates[i] <= target) {
+                temp.add(candidates[i]);
+                //dfs，注意target变为target - candidates[i]
+                backtracking(temp, combinations, i, target - candidates[i], candidates);
+                //回溯
+                temp.remove(temp.size() - 1);
+            }
+        }
+    }
+}
+```
+
