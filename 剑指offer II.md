@@ -3812,3 +3812,41 @@ class Solution {
 }
 ```
 
+
+
+### [82. 含有重复元素集合的组合](https://leetcode-cn.com/problems/4sjJUc/)
+
+```java
+class Solution {
+    public List<List<Integer>> combinationSum2(int[] candidates, int target) {
+        List<List<Integer>> combinations = new ArrayList<>();
+        Arrays.sort(candidates);
+        backtracking(new ArrayList<>(), combinations, new boolean[candidates.length],
+                     0, target, candidates);
+        return combinations;
+    }
+
+    //由于一个数字在一种组合中只能出现一次，所以要用visited来标记访问情况
+    private void backtracking(List<Integer> temp, List<List<Integer>> combinations,boolean[] visited, 							int start, int target, final int[] candidates){
+        if (target == 0) {
+            combinations.add(new ArrayList<>(temp));
+            return;
+        }
+        for (int i = start; i < candidates.length; i++){
+            //用以保证不出现重复的组合
+            if (i > 0 && candidates[i] == candidates[i - 1] && !visited[i - 1]) {
+                continue;
+            }
+            if (candidates[i] <= target) {
+                temp.add(candidates[i]);
+                visited[i] = true;
+                backtracking(temp, combinations, visited, i + 1, target - candidates[i], candidates);
+                //回溯
+                visited[i] = false;
+                temp.remove(temp.size() - 1);
+            }
+        }                            
+    }
+}
+```
+
