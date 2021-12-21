@@ -3850,3 +3850,85 @@ class Solution {
 }
 ```
 
+
+
+### [83. 没有重复元素集合的全排列](https://leetcode-cn.com/problems/VvJkup/)
+
+```java
+class Solution {
+    public List<List<Integer>> permute(int[] nums) {
+        List<List<Integer>> permutes = new ArrayList<>();
+        List<Integer> permutList = new ArrayList<>();
+        boolean[] visited = new boolean[nums.length];
+        backtracking(permutList, permutes, visited, nums);
+        return permutes;
+    }
+
+    //permutList用于保存一种排列可能性，随着dfs的进行会随时变化
+    //permutes用于临时存储迄今为止所有的排列组合，最终会作为答案返回
+    //visited用于标记一个数字是否已经被访问过
+    private void backtracking(List<Integer> permutList, List<List<Integer>> permutes, 
+                              boolean[] visited, final int[] nums) {
+        //若当前排列的长度等于数字总数，就把这个排列加入到答案中
+        if (permutList.size() == nums.length) {
+            permutes.add(new ArrayList<>(permutList));
+            return;
+        }
+        //尝试对其它所有的数字进行dfs
+        for (int i = 0; i < visited.length; i++) {
+            //如果一个数字已经访问过，直接返回
+            if(visited[i]){
+                continue;
+            }
+            //标记当前数字已被访问，并把nums[i]加入到当前排列中
+            visited[i] = true;
+            permutList.add(nums[i]);
+            //dfs
+            backtracking(permutList, permutes, visited, nums);
+            //回溯
+            permutList.remove(permutList.size() - 1);
+            visited[i] = false;
+        }
+    }
+}
+```
+
+
+
+### [84. 含有重复元素集合的全排列](https://leetcode-cn.com/problems/7p8L0Z/)
+
+```java
+class Solution {
+    public List<List<Integer>> permuteUnique(int[] nums) {
+        List<List<Integer>> permutes = new ArrayList<>();
+        List<Integer> permuteList = new ArrayList<>();
+        Arrays.sort(nums);  // 排序
+        boolean[] hasVisited = new boolean[nums.length];
+        backtracking(permuteList, permutes, hasVisited, nums);
+        return permutes;
+    }
+
+    private void backtracking(List<Integer> permuteList, List<List<Integer>> permutes, boolean[] visited, final int[] nums){
+        if(permuteList.size() == nums.length){
+            permutes.add(new ArrayList<>(permuteList));
+            return;
+        }
+        for (int i = 0; i < visited.length; i++) {
+            //这个操作是为了防止出现重复的排列
+            //先填写最左侧且未被访问过的重复元素
+            if(i != 0 && nums[i] == nums[i - 1] && !visited[i - 1]){
+                continue;
+            }
+            if(visited[i]){
+                continue;
+            }
+            visited[i] = true;
+            permuteList.add(nums[i]);
+            backtracking(permuteList, permutes, visited, nums);
+            permuteList.remove(permuteList.size() - 1);
+            visited[i] = false;
+        }
+    }
+}
+```
+
