@@ -3932,3 +3932,38 @@ class Solution {
 }
 ```
 
+
+
+### [85. 生成匹配的括号](https://leetcode-cn.com/problems/IDBivT/)
+
+```java
+class Solution {
+    List<String> res = new ArrayList<>();
+    public List<String> generateParenthesis(int n) {
+        //一开始生成的括号字符串为空串，由于有n对括号，所以左右括号都有n个
+        getParenthesis("", n, n);
+        return res;
+    }
+
+    //生成所有正确的括号字符串并加入到res中
+    //left和right是剩余左括号和右括号的数量
+    //str是动态生成中的括号字符串
+    private void getParenthesis(String str, int left, int right){
+        if (left == 0 && right == 0){
+            res.add(str);
+            return;
+        }
+        //当左右括号相等时，必须用左括号拼接在str后面
+        //为什么必须用左括号？因为如果用了右括号，就会出现最后一个括号是左括号的情况
+        if (left == right){
+            getParenthesis(str + "(", left - 1, right);
+        }else if (left < right){
+            //当右括号数量大于左括号，此时str后拼接左括号或右括号都行，但是要判断左括号的数量，保证它大于0才能拼接左括号
+            if (left > 0){
+                getParenthesis(str + "(", left - 1, right);
+            }
+            getParenthesis(str + ")", left, right - 1);
+        }
+    }
+}
+```
