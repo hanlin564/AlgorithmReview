@@ -4009,3 +4009,55 @@ class Solution {
     }
 }
 ```
+
+
+
+### [87. 复原 IP](https://leetcode-cn.com/problems/0on3uN/)
+
+```java
+class Solution {
+    public List<String> restoreIpAddresses(String s) {
+        List<String> ans = new ArrayList<>();
+        StringBuilder tempAns = new StringBuilder();
+        restore(0, tempAns, ans, s);
+        return ans;
+    }
+
+    //k表示当前正在处理IP地址的第k+1个整数
+    //tempAns用于临时保存一种可能的IP，并在恰当时候加入ans中
+    //ans用于存储迄今为止所有可能性，最终作为答案返回
+    //s是数字字符串，随着dfs的深入会把前面的部分忽略掉
+    private void restore(int k, StringBuilder tempAns, List<String> ans, String s){
+        if (k == 4 || s.length() == 0) {
+            //此时IP地址的四个整数都组合出来了，就把当前组合tempAns加入到ans中
+            if (k == 4 && s.length() == 0) {
+                ans.add(tempAns.toString());
+            }
+            //其它情况说明无法凑出正确的IP地址，直接退出方法
+            return;
+        }
+        //i<=2的作用：确保每个整数不超过三位数
+        for (int i = 0; i < s.length() && i <= 2; i++) {
+            //如果首数字是0且当前数不为0就退出循环（不能含有前导0）
+            if (i != 0 && s.charAt(0) == '0') {
+                break;
+            }
+            //part为准备加入到tempAns中的下一段数字组合
+            String part = s.substring(0, i + 1);
+            //确保part小于255
+            if (Integer.valueOf(part) <= 255) {
+                //如果tempAns已经有一些数字，那么要加.
+                //如果tempAns是空的则不用
+                if (tempAns.length() != 0) {
+                    part = "." + part;
+                }
+                tempAns.append(part);
+                //对k+1部分的整数和从i+1开始的字串做dfs
+                restore(k + 1, tempAns, ans, s.substring(i + 1));
+                //回溯，把part从tempAns中删去
+                tempAns.delete(tempAns.length() - part.length(), tempAns.length());
+            }
+        }
+    }
+}
+```
