@@ -4061,3 +4061,79 @@ class Solution {
     }
 }
 ```
+
+
+
+### [88. 爬楼梯的最少成本](https://leetcode-cn.com/problems/GzCJIP/)
+
+```java
+class Solution {
+    public int minCostClimbingStairs(int[] cost) {
+        int n = cost.length;
+        int prev = 0, cur = 0;
+        for (int i = 2; i <= n; i++) {
+            // next表示爬到当前楼梯所需的最小花费
+            // next值可能由两种状态转移而来
+            // 1.从下面一级楼梯走一级上来
+            // 2.从下面两级楼梯走两级上来
+            // 取较小的值
+            int next = Math.min(cur + cost[i - 1], prev + cost[i - 2]);
+            prev = cur;
+            cur = next;
+        }
+        return cur;
+    }
+}
+```
+
+
+
+### [89. 房屋偷盗](https://leetcode-cn.com/problems/Gu0c2T/)
+
+```java
+class Solution {
+    public int rob(int[] nums) {
+        //pre2表示抢劫当前房屋的前两个房子的最大抢劫量
+        //pre1表示抢劫当前房屋的前一个房子的最大抢劫量
+        //cur存储了当前的最大抢劫量
+        int pre2 = 0, pre1 = 0, cur = 0;
+        for (int i = 0; i < nums.length; i++) {
+            //有两种方案：偷当前房屋的前一间房，或是偷当前房屋
+            //偷当前房屋情况下：总抢劫量=前两间房屋的总抢劫量+当前房屋增加的抢劫量
+            //偷前一间房：总抢劫量=前一间房的总抢劫量
+            cur = Math.max(pre2 + nums[i], pre1);
+            pre2 = pre1;
+            pre1 = cur;
+        }
+        return cur;
+    }
+}
+```
+
+
+
+### [90. 环形房屋偷盗](https://leetcode-cn.com/problems/PzWKhm/)
+
+```java
+class Solution {
+    public int rob(int[] nums) {
+        int n = nums.length;
+        if (n == 1) {
+            return nums[0];
+        }
+
+        // 偷第一家 or 不偷第一家，选择偷的金额最大的路线
+        return Math.max(rob(nums, 0, n - 2), rob(nums, 1, n - 1));
+    }
+
+    private int rob(int[] nums, int first, int last) {
+        int pre2 = 0, pre1 = 0, cur = 0;
+        for (int i = first; i <= last; i++) {
+            cur = Math.max(pre1, pre2 + nums[i]);
+            pre2 = pre1;
+            pre1 = cur;
+        }
+        return cur;
+    }
+}
+```
