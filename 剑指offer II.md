@@ -4137,3 +4137,52 @@ class Solution {
     }
 }
 ```
+
+
+
+### [91. 粉刷房子](https://leetcode-cn.com/problems/JEj789/)
+
+```java
+class Solution {
+    public int minCost(int[][] costs) {
+        // dp[i][j]表示在粉刷第i间房子，要粉刷j颜色之前的最小粉刷价格
+        int[][] dp = new int[costs.length][3];
+        for (int i = 0; i < 3; i++) {
+            dp[0][i] = costs[0][i];
+        }
+        for (int i = 1; i < costs.length; i++) {
+            // 相邻的房子不能粉刷一样的颜色
+            dp[i][0] = Math.min(dp[i-1][1], dp[i-1][2]) + costs[i][0];
+            dp[i][1] = Math.min(dp[i-1][0], dp[i-1][2]) + costs[i][1];
+            dp[i][2] = Math.min(dp[i-1][0], dp[i-1][1]) + costs[i][2];
+        }
+        // 选择最小的成本
+        return Math.min(dp[costs.length - 1][0], Math.min(dp[costs.length - 1][1], dp[costs.length - 1][2]));
+    }
+}
+```
+
+
+
+### [92. 翻转字符](https://leetcode-cn.com/problems/cyJERH/)
+
+https://leetcode-cn.com/problems/cyJERH/solution/dong-tai-gui-hua-jiang-wei-yi-bu-bu-you-ojinj/
+
+这题看不懂题解，麻了
+
+```java
+class Solution {
+    public int minFlipsMonoIncr(String s) {
+        int n = s.length();
+        int one = 0, zero = 0;
+        for(char c : s.toCharArray()){
+            if(c == '0') one = Math.min(zero, one) + 1;
+            else if(c == '1'){
+                one = Math.min(zero, one);
+                zero++;
+            }
+        }
+    return Math.min(one, zero);
+    }
+}
+```
