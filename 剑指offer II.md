@@ -4186,3 +4186,37 @@ class Solution {
     }
 }
 ```
+
+
+
+### [93. 最长斐波那契数列](https://leetcode-cn.com/problems/Q91FMA/)
+
+```java
+class Solution {
+    public int lenLongestFibSubseq(int[] arr) {
+        int n = arr.length;
+        int[][] dp = new int[n][n]; // dp[i][j]表示以arr[i]和arr[j]为最后两项的最大斐波拉契子序列长度
+        int ans = 0;
+
+        Map<Integer, Integer> indexOfNum = new HashMap<>();
+        for (int i = 0; i < n; i++) {
+            indexOfNum.put(arr[i], i);
+        }
+
+        for (int k = 2; k < n; k++) {
+            for (int j = k - 1; j > 0; j--) {
+                int num_i = arr[k] - arr[j];
+                if (indexOfNum.containsKey(num_i)) {
+                    int i = indexOfNum.get(num_i);
+                    if (i < j) {
+                        dp[j][k] = Math.max(dp[j][k], dp[i][j] + 1); // 固定了k的位置，从后往前试图找到最长的斐波那契数列
+                        ans = Math.max(ans, dp[j][k] + 2); // 由于一开始dp[j][k]=1，而斐波那契数列长度至少为3，所以要+2
+                    }
+                }
+            }
+        }
+
+        return ans;
+    }
+}
+```
